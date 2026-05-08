@@ -1,4 +1,4 @@
-# PaletteFilm — Palette Extractor
+# Zen - Python
 
 Microservice FastAPI d'extraction de couleurs dominantes depuis des images de films.
 

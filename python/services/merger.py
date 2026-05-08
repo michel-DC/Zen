@@ -1,6 +1,4 @@
 from utils.color import rgb_to_hsl, hue_distance
-
-
 def merge_palettes(all_colors: list[list[tuple[int, int, int]]]) -> list[tuple[int, int, int]]:
     flat: list[tuple[int, int, int]] = []
     for palette in all_colors:
