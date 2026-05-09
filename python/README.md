@@ -1,13 +1,13 @@
-# Zen - Python
+# Zen - Backend Python
 
-Microservice FastAPI d'extraction de couleurs dominantes depuis des images de films.
+Backend complet FastAPI pour la gestion des films et l'extraction de palettes de couleurs.
 
 ## Installation Locale
 
 ```bash
-cd python/services/palette
+cd python
 python -m venv venv
-./venv/Scripts/activate
+./venv/Scripts/activate # Windows
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```

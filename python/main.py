@@ -2,14 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
 from core.logging import setup_logging
-from routers import palette
+from core.database import init_db
+from routers import palette, movies
 
 setup_logging()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Microservice d'extraction de couleurs dominantes depuis des images de films",
+    description="Backend complet Zen : Gestion de films et extraction de palettes",
 )
 
 app.add_middleware(
@@ -20,7 +21,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(palette.router)
+@app.on_event("startup")
+def on_startup():
+    print(f"--- Configuration Checking ---")
+    print(f"PROJECT: {settings.PROJECT_NAME}")
+    print(f"DATABASE: {'LOADED' if settings.DATABASE_URL != 'sqlite:///./zen.db' else 'DEFAULT (SQLITE)'}")
+    print(f"TMDB_KEY: {'SET' if settings.TMDB_API_KEY else 'MISSING'}")
+    print(f"------------------------------")
+    init_db()
+
+app.include_router(palette.router, prefix="/api/v1")
+app.include_router(movies.router, prefix="/api/v1")
 
 
 @app.get("/health")

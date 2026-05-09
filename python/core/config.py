@@ -3,13 +3,28 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # API Settings
-    PROJECT_NAME: str = "# Extracteur palette de couleurs"
+    PROJECT_NAME: str = "Zen Backend"
     VERSION: str = "1.0.0"
     API_V1_STR: str = ""
 
+    # API TMDB
+    TMDB_API_KEY: str = ""
+    TMDB_BASE_URL: str = "https://api.themoviedb.org/3"
+    TMDB_IMAGE_BASE_URL: str = "https://image.tmdb.org/t/p"
+
+    # Database
+    DATABASE_URL: str = "sqlite:///./zen.db"
+
+    @property
+    def sync_database_url(self) -> str:
+        """Force l'utilisation de postgresql:// au lieu de postgres:// pour SQLAlchemy."""
+        if self.DATABASE_URL.startswith("postgres://"):
+            return self.DATABASE_URL.replace("postgres://", "postgresql://", 1)
+        return self.DATABASE_URL
+
     # Extraction Settings
     COLORS_PER_IMAGE: int = 12
-    MAX_IMAGES: int = 5
+    MAX_IMAGES: int = 3
     DOWNLOAD_TIMEOUT: int = 10
     
     # CORS Settings
@@ -18,6 +33,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
+        extra="ignore"
     )
 
 
