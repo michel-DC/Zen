@@ -1,0 +1,221 @@
+"use client";
+
+import { HeaderLoadingLine } from "@/components/layout/loading-line-provider";
+import { ModeToggle } from "@/components/layout/mode-toggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Brain,
+  Check,
+  ChevronDown,
+  Clapperboard,
+  Drama,
+  Ghost,
+  Heart,
+  Laugh,
+  Rocket,
+  Search,
+  Shield,
+  Sparkles,
+  Sword,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { FaGithub } from "react-icons/fa6";
+
+export default function Header() {
+  const genres = [
+    {
+      label: "Action",
+      icon: Clapperboard,
+      iconClass: "text-red-500",
+    },
+    {
+      label: "Drame",
+      icon: Drama,
+      iconClass: "text-orange-500",
+    },
+    {
+      label: "Comédie",
+      icon: Laugh,
+      iconClass: "text-yellow-500",
+    },
+    {
+      label: "Horreur",
+      icon: Ghost,
+      iconClass: "text-violet-500",
+    },
+    {
+      label: "Science-fiction",
+      icon: Rocket,
+      iconClass: "text-cyan-500",
+    },
+    {
+      label: "Fantastique",
+      icon: Sword,
+      iconClass: "text-amber-700",
+    },
+    {
+      label: "Romance",
+      icon: Heart,
+      iconClass: "text-pink-500",
+    },
+    {
+      label: "Thriller",
+      icon: Shield,
+      iconClass: "text-blue-500",
+    },
+    {
+      label: "Mystère",
+      icon: Brain,
+      iconClass: "text-green-500",
+    },
+    {
+      label: "Animation",
+      icon: Sparkles,
+      iconClass: "text-fuchsia-500",
+    },
+  ];
+
+  const filters = ["Récent", "Populaire", "Tendance"];
+
+  const [selectedFilter, setSelectedFilter] = useState("Récent");
+
+  const firstGenre = genres[0];
+  const FirstGenreIcon = firstGenre.icon;
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/60 backdrop-blur-sm">
+      <div className="flex h-15 items-center gap-4 px-8">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Image
+            src="/icons/favicon.png"
+            alt="Zen"
+            width={26}
+            height={26}
+            className="h-8 w-8"
+          />
+          <span className="text-lg font-semibold text-foreground">Zen</span>
+        </Link>
+
+        <div className="flex-1" />
+
+        <div className="flex items-center gap-3 -mr-2">
+          <div className="relative sm:w-57.5">
+            <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Rechercher..."
+              autoComplete="off"
+              className="peer h-10 w-full rounded-lg border border-background bg-muted px-3 py-1 pl-8 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#2a2a2a] dark:text-[#f2f2f2] dark:placeholder:text-[#9a9a9a] dark:shadow-none"
+            />
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 hidden md:flex p-0s md:pl-1 md:pr-1"
+              >
+                <span className="mr-2 font-light text-gray-400">
+                  Filtrer par:
+                </span>
+
+                {selectedFilter}
+
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-44 p-1">
+              <div className="flex flex-col">
+                {filters.map((filter) => (
+                  <DropdownMenuItem
+                    key={filter}
+                    onClick={() => setSelectedFilter(filter)}
+                    className="flex items-center justify-between rounded-md px-3 py-2"
+                  >
+                    <span>{filter}</span>
+
+                    {selectedFilter === filter && (
+                      <Check className="h-4 w-4 text-foreground" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 p-0 md:pl-3 md:pr-3"
+              >
+                <span className="mr-1 flex h-6 w-6 items-center justify-center">
+                  <FirstGenreIcon
+                    className={`h-4 w-4 ${firstGenre.iconClass}`}
+                  />
+                </span>
+
+                <span className="hidden md:block">{firstGenre.label}</span>
+
+                <span className="md:hidden font-semibold text-foreground">
+                  {firstGenre.label}
+                </span>
+
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-44">
+              {genres.map((genre) => {
+                const Icon = genre.icon;
+
+                return (
+                  <DropdownMenuItem key={genre.label} className="py-1.5">
+                    <Icon className={`mr-1.5 h-4 w-4 ${genre.iconClass}`} />
+
+                    <span>{genre.label}</span>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="origin-center scale-90">
+            <ModeToggle />
+          </div>
+
+          <Link
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden h-9 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:flex"
+          >
+            <FaGithub className="h-4 w-4" />
+            <span className="sr-only">GitHub</span>
+          </Link>
+        </div>
+      </div>
+
+      <HeaderLoadingLine />
+    </header>
+  );
+}
