@@ -14,6 +14,7 @@ class TMDBClient:
         params = params or {}
         params["api_key"] = self.api_key
         params["language"] = "fr-FR"
+        params["include_adult"] = "false"
         
         async with httpx.AsyncClient() as client:
             try:

@@ -26,10 +26,15 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
 
 export default function Header() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(searchParams.get("search") || "");
+
   const genres = [
     {
       label: "Action",
@@ -96,6 +101,18 @@ export default function Header() {
     setMounted(true);
   }, []);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchValue) {
+      params.set("search", searchValue);
+    } else {
+      params.delete("search");
+    }
+    params.set("page", "1");
+    router.push(`/?${params.toString()}`);
+  };
+
   if (!mounted) {
     return null;
   }
@@ -117,15 +134,17 @@ export default function Header() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-3 -mr-2">
-          <div className="relative sm:w-57.5">
+          <form onSubmit={handleSearch} className="relative sm:w-57.5">
             <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Rechercher..."
               autoComplete="off"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               className="peer h-10 w-full rounded-lg border border-background bg-muted px-3 py-1 pl-8 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#2a2a2a] dark:text-[#f2f2f2] dark:placeholder:text-[#9a9a9a] dark:shadow-none"
             />
-          </div>
+          </form>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

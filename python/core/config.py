@@ -12,21 +12,11 @@ class Settings(BaseSettings):
     TMDB_BASE_URL: str = "https://api.themoviedb.org/3"
     TMDB_IMAGE_BASE_URL: str = "https://image.tmdb.org/t/p"
 
-    # Database
-    DATABASE_URL: str = "sqlite:///./zen.db"
-
-    @property
-    def sync_database_url(self) -> str:
-        """Force l'utilisation de postgresql:// au lieu de postgres:// pour SQLAlchemy."""
-        if self.DATABASE_URL.startswith("postgres://"):
-            return self.DATABASE_URL.replace("postgres://", "postgresql://", 1)
-        return self.DATABASE_URL
-
     # Extraction Settings
     COLORS_PER_IMAGE: int = 12
     MAX_IMAGES: int = 3
     DOWNLOAD_TIMEOUT: int = 10
-    
+
     # CORS Settings
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 
