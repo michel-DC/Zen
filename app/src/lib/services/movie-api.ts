@@ -19,6 +19,11 @@ export interface DetailedMovie extends Omit<Movie, "palette"> {
     percentage: number;
   }[];
   genres: string[];
+  cast: {
+    name: string;
+    profile_path: string | null;
+  }[];
+  vote_average: number;
 }
 
 export interface PaginatedResponse<T> {

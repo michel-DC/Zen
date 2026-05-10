@@ -27,7 +27,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FaGithub } from "react-icons/fa6";
 
 export default function Header() {
@@ -36,62 +36,20 @@ export default function Header() {
   const [searchValue, setSearchValue] = useState(searchParams.get("search") || "");
 
   const genres = [
-    {
-      label: "Action",
-      icon: Clapperboard,
-      iconClass: "text-red-500",
-    },
-    {
-      label: "Drame",
-      icon: Drama,
-      iconClass: "text-orange-500",
-    },
-    {
-      label: "Comédie",
-      icon: Laugh,
-      iconClass: "text-yellow-500",
-    },
-    {
-      label: "Horreur",
-      icon: Ghost,
-      iconClass: "text-violet-500",
-    },
-    {
-      label: "Science-fiction",
-      icon: Rocket,
-      iconClass: "text-cyan-500",
-    },
-    {
-      label: "Fantastique",
-      icon: Sword,
-      iconClass: "text-amber-700",
-    },
-    {
-      label: "Romance",
-      icon: Heart,
-      iconClass: "text-pink-500",
-    },
-    {
-      label: "Thriller",
-      icon: Shield,
-      iconClass: "text-blue-500",
-    },
-    {
-      label: "Mystère",
-      icon: Brain,
-      iconClass: "text-green-500",
-    },
-    {
-      label: "Animation",
-      icon: Sparkles,
-      iconClass: "text-fuchsia-500",
-    },
+    { label: "Action", icon: Clapperboard, iconClass: "text-red-500" },
+    { label: "Drame", icon: Drama, iconClass: "text-orange-500" },
+    { label: "Comédie", icon: Laugh, iconClass: "text-yellow-500" },
+    { label: "Horreur", icon: Ghost, iconClass: "text-violet-500" },
+    { label: "Science-fiction", icon: Rocket, iconClass: "text-cyan-500" },
+    { label: "Fantastique", icon: Sword, iconClass: "text-amber-700" },
+    { label: "Romance", icon: Heart, iconClass: "text-pink-500" },
+    { label: "Thriller", icon: Shield, iconClass: "text-blue-500" },
+    { label: "Mystère", icon: Brain, iconClass: "text-green-500" },
+    { label: "Animation", icon: Sparkles, iconClass: "text-fuchsia-500" },
   ];
 
   const filters = ["Récent", "Populaire", "Tendance"];
-
   const [selectedFilter, setSelectedFilter] = useState("Récent");
-
   const firstGenre = genres[0];
   const FirstGenreIcon = firstGenre.icon;
 
@@ -101,21 +59,49 @@ export default function Header() {
     setMounted(true);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams(searchParams.toString());
-    if (searchValue) {
-      params.set("search", searchValue);
+  /**
+   * Met à jour l'URL avec la valeur de recherche (Debounced)
+   */
+  const performSearch = useCallback((value: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (value) {
+      params.set("search", value);
     } else {
       params.delete("search");
     }
     params.set("page", "1");
     router.push(`/?${params.toString()}`);
+  }, [router]);
+
+  // Effet de Debounce pour la recherche dynamique
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Ne pas déclencher au premier montage si la valeur est identique à l'URL
+    const currentSearch = searchParams.get("search") || "";
+    if (searchValue === currentSearch) return;
+
+    const timer = setTimeout(() => {
+      performSearch(searchValue);
+    }, 500); // 500ms d'attente après la fin de la frappe
+
+    return () => clearTimeout(timer);
+  }, [searchValue, performSearch, mounted, searchParams]);
+
+  // Synchroniser searchValue si l'URL change (ex: clic sur logo)
+  useEffect(() => {
+    const currentSearch = searchParams.get("search") || "";
+    if (currentSearch !== searchValue) {
+      setSearchValue(currentSearch);
+    }
+  }, [searchParams]);
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    performSearch(searchValue); // Force la recherche immédiate sur "Entrée"
   };
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/60 backdrop-blur-sm">
@@ -134,7 +120,7 @@ export default function Header() {
         <div className="flex-1" />
 
         <div className="flex items-center gap-3 -mr-2">
-          <form onSubmit={handleSearch} className="relative sm:w-57.5">
+          <form onSubmit={handleFormSubmit} className="relative sm:w-57.5">
             <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
@@ -155,13 +141,10 @@ export default function Header() {
                 <span className="mr-2 font-light text-gray-400">
                   Filtrer par:
                 </span>
-
                 {selectedFilter}
-
                 <ChevronDown className="ml-2 h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent align="end" className="w-44 p-1">
               <div className="flex flex-col">
                 {filters.map((filter) => (
@@ -171,7 +154,6 @@ export default function Header() {
                     className="flex items-center justify-between rounded-md px-3 py-2"
                   >
                     <span>{filter}</span>
-
                     {selectedFilter === filter && (
                       <Check className="h-4 w-4 text-foreground" />
                     )}
@@ -192,25 +174,19 @@ export default function Header() {
                     className={`h-4 w-4 ${firstGenre.iconClass}`}
                   />
                 </span>
-
                 <span className="hidden md:block">{firstGenre.label}</span>
-
                 <span className="md:hidden font-semibold text-foreground">
                   {firstGenre.label}
                 </span>
-
                 <ChevronDown className="ml-2 h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent align="end" className="w-44">
               {genres.map((genre) => {
                 const Icon = genre.icon;
-
                 return (
                   <DropdownMenuItem key={genre.label} className="py-1.5">
                     <Icon className={`mr-1.5 h-4 w-4 ${genre.iconClass}`} />
-
                     <span>{genre.label}</span>
                   </DropdownMenuItem>
                 );

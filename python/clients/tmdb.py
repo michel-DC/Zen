@@ -26,13 +26,13 @@ class TMDBClient:
             except Exception as e:
                 raise PaletteExtractionError(f"Network error calling TMDB: {str(e)}")
 
-    async def get_popular_movies(self, page: int = 1) -> List[Dict[str, Any]]:
-        data = await self._get("/movie/popular", params={"page": page})
-        return data.get("results", [])
+    async def get_popular_movies(self, page: int = 1) -> Dict[str, Any]:
+        """Retourne l'objet complet TMDB (results, total_pages, etc.)"""
+        return await self._get("/movie/popular", params={"page": page})
 
-    async def search_movies(self, query: str, page: int = 1) -> List[Dict[str, Any]]:
-        data = await self._get("/search/movie", params={"query": query, "page": page})
-        return data.get("results", [])
+    async def search_movies(self, query: str, page: int = 1) -> Dict[str, Any]:
+        """Retourne l'objet complet TMDB (results, total_pages, etc.)"""
+        return await self._get("/search/movie", params={"query": query, "page": page})
 
     async def get_movie_details(self, movie_id: int) -> Dict[str, Any]:
         return await self._get(f"/movie/{movie_id}")
@@ -43,7 +43,6 @@ class TMDBClient:
     async def get_movie_images(self, movie_id: int) -> List[str]:
         data = await self._get(f"/movie/{movie_id}/images", params={"include_image_language": "en,null"})
         backdrops = data.get("backdrops", [])
-        # On construit les URLs complètes pour le microservice
         return [f"{settings.TMDB_IMAGE_BASE_URL}/original{b['file_path']}" for b in backdrops]
 
 tmdb_client = TMDBClient()

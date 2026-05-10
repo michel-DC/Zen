@@ -9,31 +9,33 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 import { useLoadingLine } from "@/components/layout/loading-line-provider";
 import { movieApi, type Movie } from "@/lib/services/movie-api";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { ArrowLeft, Home } from "lucide-react";
 import * as React from "react";
 
 export default function MovieGrid() {
   const { runAfterLoading } = useLoadingLine();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  
   const searchQuery = searchParams.get("search") || "";
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
   
   const [movies, setMovies] = React.useState<Movie[]>([]);
-  const [page, setPage] = React.useState(1);
   const [totalPages, setTotalPages] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const fetchMovies = React.useCallback(async (targetPage: number, query?: string) => {
     try {
       setIsLoading(true);
-      // On vide la liste si c'est une nouvelle recherche pour afficher les skeletons
-      setMovies([]); 
+      setMovies([]); // Reset pour afficher les skeletons
       
       const response = await movieApi.getMovies(targetPage, 32, query);
       setMovies(response.data);
       setTotalPages(response.pagination.total_pages);
-      setPage(response.pagination.page);
     } catch (error) {
       console.error("Failed to fetch movies:", error);
     } finally {
@@ -41,21 +43,30 @@ export default function MovieGrid() {
     }
   }, []);
 
-  // Chargement initial et lors du changement de recherche
+  // Déclenché quand le texte de recherche OU la page change dans l'URL
   React.useEffect(() => {
-    fetchMovies(1, searchQuery);
-  }, [fetchMovies, searchQuery]);
+    fetchMovies(currentPage, searchQuery);
+  }, [fetchMovies, searchQuery, currentPage]);
 
   const handlePageChange = (newPage: number) => {
-    if (newPage === page || newPage < 1 || newPage > totalPages) return;
+    if (newPage < 1 || newPage > totalPages) return;
 
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+    
     runAfterLoading(async () => {
-      await fetchMovies(newPage, searchQuery);
+      router.push(`/?${params.toString()}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   };
 
-  // État de chargement initial ou transition de recherche
+  const resetSearch = () => {
+    runAfterLoading(async () => {
+      router.push("/");
+    });
+  };
+
+  // État de chargement
   if (isLoading && movies.length === 0) {
     return (
       <section className="max-w-full mx-auto px-4">
@@ -85,12 +96,14 @@ export default function MovieGrid() {
           </div>
           <h3 className="text-xl font-semibold">Aucun résultat</h3>
           <p className="text-muted-foreground mt-2">Nous n'avons trouvé aucun film correspondant à "{searchQuery}"</p>
-          <button 
-            onClick={() => window.location.href = '/'}
-            className="mt-6 text-sm font-medium text-primary hover:underline"
+          <Button 
+            variant="outline"
+            onClick={resetSearch}
+            className="mt-8 gap-2"
           >
+            <ArrowLeft className="w-4 h-4" />
             Retour à l'accueil
-          </button>
+          </Button>
         </div>
       ) : (
         <>
@@ -107,8 +120,9 @@ export default function MovieGrid() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-16 mb-12">
+          {/* Logique de pagination / bouton retour */}
+          <div className="mt-16 mb-12 flex justify-center">
+            {totalPages > 1 ? (
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
@@ -116,7 +130,7 @@ export default function MovieGrid() {
                       href="#"
                       onClick={(e: any) => {
                         e.preventDefault();
-                        handlePageChange(page - 1);
+                        handlePageChange(currentPage - 1);
                       }}
                     />
                   </PaginationItem>
@@ -124,8 +138,8 @@ export default function MovieGrid() {
                   {Array.from({ length: totalPages }).map((_, idx) => {
                     const num = idx + 1;
                     if (totalPages > 7) {
-                      if (num > 1 && num < totalPages && (num < page - 1 || num > page + 1)) {
-                        if (num === page - 2 || num === page + 2) {
+                      if (num > 1 && num < totalPages && (num < currentPage - 1 || num > currentPage + 1)) {
+                        if (num === currentPage - 2 || num === currentPage + 2) {
                            return <PaginationItem key={num} className="hidden sm:inline-block">...</PaginationItem>;
                         }
                         return null;
@@ -136,7 +150,7 @@ export default function MovieGrid() {
                       <PaginationItem key={num}>
                         <PaginationLink
                           href="#"
-                          isActive={num === page}
+                          isActive={num === currentPage}
                           onClick={(e: any) => {
                             e.preventDefault();
                             handlePageChange(num);
@@ -153,14 +167,24 @@ export default function MovieGrid() {
                       href="#"
                       onClick={(e: any) => {
                         e.preventDefault();
-                        handlePageChange(page + 1);
+                        handlePageChange(currentPage + 1);
                       }}
                     />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </div>
-          )}
+            ) : searchQuery ? (
+              // Si une seule page en mode recherche, on affiche le bouton retour
+              <Button 
+                variant="outline"
+                onClick={resetSearch}
+                className="gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Retour à l'accueil
+              </Button>
+            ) : null}
+          </div>
         </>
       )}
     </section>

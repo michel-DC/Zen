@@ -16,7 +16,7 @@ async def enrich_movie_metadata(movie: dict, use_backdrops: bool = False) -> dic
         movie_id = movie["id"]
         tasks = []
         
-        # Tâche A : Récupérer le réalisateur
+        # Tâche A : Récupérer le réalisateur et le cast
         tasks.append(tmdb_client.get_movie_credits(movie_id))
         
         # Tâche B : Préparer l'extraction de palette
@@ -29,9 +29,18 @@ async def enrich_movie_metadata(movie: dict, use_backdrops: bool = False) -> dic
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        # Traitement réalisateur
+        # Traitement réalisateur et cast
         credits = results[0] if not isinstance(results[0], Exception) else {}
         movie["director"] = next((c["name"] for c in credits.get("crew", []) if c["job"] == "Director"), "Inconnu")
+        
+        # On ne prend que les 10 premiers acteurs
+        movie["cast"] = [
+            {
+                "name": cast["name"],
+                "profile_path": cast["profile_path"]
+            }
+            for cast in credits.get("cast", [])[:10]
+        ]
         
         # Traitement palette
         image_urls = results[1] if isinstance(results[1], list) else []
@@ -53,9 +62,9 @@ async def enrich_movie_metadata(movie: dict, use_backdrops: bool = False) -> dic
             except Exception:
                 pass
     except Exception:
-        # Si tout l'enrichissement plante pour CE film, on met des valeurs par défaut
         movie["director"] = "Inconnu"
         movie["palette"] = []
+        movie["cast"] = []
         
     return movie
 
@@ -65,38 +74,39 @@ async def get_movies(
     search: Optional[str] = Query(None),
 ):
     """
-    Récupère les films et les enrichit. Utilise return_exceptions pour ne pas bloquer la liste.
+    Récupère les films et les enrichit. Utilise les vraies infos de pagination de TMDB.
     """
     try:
         if search:
-            results = await tmdb_client.search_movies(search, page=page)
+            response = await tmdb_client.search_movies(search, page=page)
         else:
-            results = await tmdb_client.get_popular_movies(page=page)
+            response = await tmdb_client.get_popular_movies(page=page)
         
-        # Filtrage basique
+        results = response.get("results", [])
+        total_pages = response.get("total_pages", 1)
+        total_results = response.get("total_results", 0)
+
+        # Filtrage des films sans posters
         valid_results = [m for m in results if m.get("poster_path")]
         
-        # Enrichissement parallèle de TOUS les films de la page
-        # On utilise return_exceptions=True ici aussi par sécurité
+        # Enrichissement parallèle
         enriched_movies = await asyncio.gather(
             *[enrich_movie_metadata(m) for m in valid_results],
             return_exceptions=True
         )
         
-        # On ne garde que les résultats qui ne sont pas des exceptions
         final_movies = [m for m in enriched_movies if isinstance(m, dict)]
         
         return {
             "data": final_movies,
             "pagination": {
                 "page": page,
-                "limit": len(final_movies),
-                "total": 10000,
-                "total_pages": 500
+                "limit": len(results),
+                "total": total_results,
+                "total_pages": total_pages
             }
         }
     except Exception as e:
-        # Erreur globale (ex: TMDB inaccessible)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/movies/{movie_id}")
