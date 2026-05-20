@@ -228,7 +228,6 @@ body {
 
 @layer utilities {
   .animate-zen-rainbow-loader {
-    animation: zen-rainbow-loader 920ms cubic-bezier(0.4, 0, 0.2, 1) infinite
-      alternate;
+    animation: zen-rainbow-loader 920ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 }

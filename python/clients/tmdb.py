@@ -30,6 +30,23 @@ class TMDBClient:
         """Retourne l'objet complet TMDB (results, total_pages, etc.)"""
         return await self._get("/movie/popular", params={"page": page})
 
+    async def get_trending_movies(self, page: int = 1) -> Dict[str, Any]:
+        """Retourne les films tendances de la semaine"""
+        return await self._get("/trending/movie/week", params={"page": page})
+
+    async def get_upcoming_movies(self, page: int = 1) -> Dict[str, Any]:
+        """Retourne les films à venir (Récent)"""
+        return await self._get("/movie/upcoming", params={"page": page})
+
+    async def get_movies_by_genre(self, genre_id: int, page: int = 1) -> Dict[str, Any]:
+        """Découvre des films par genre"""
+        return await self._get("/discover/movie", params={"with_genres": genre_id, "page": page, "sort_by": "popularity.desc"})
+
+    async def get_genres(self) -> List[Dict[str, Any]]:
+        """Récupère la liste des genres TMDB"""
+        data = await self._get("/genre/movie/list")
+        return data.get("genres", [])
+
     async def search_movies(self, query: str, page: int = 1) -> Dict[str, Any]:
         """Retourne l'objet complet TMDB (results, total_pages, etc.)"""
         return await self._get("/search/movie", params={"query": query, "page": page})

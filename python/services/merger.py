@@ -8,14 +8,15 @@ def merge_palettes(all_colors: list[list[tuple[int, int, int]]]) -> list[tuple[i
     clusters = []
     for color in flat:
         h, s, l = rgb_to_hsl(color)
-        # Ignorer neutres
-        if s < 10 and l > 15 and l < 90:
+        # Moins restrictif sur les neutres
+        if s < 5 and (l < 10 or l > 95):
             continue
         
         placed = False
         for cluster in clusters:
             rep_h, _, _ = rgb_to_hsl(cluster[0])
-            if abs(h - rep_h) < 25 or abs(h - rep_h) > 335:
+            # Seuil de fusion réduit pour plus de nuances
+            if abs(h - rep_h) < 15 or abs(h - rep_h) > 345:
                 cluster.append(color)
                 placed = True
                 break

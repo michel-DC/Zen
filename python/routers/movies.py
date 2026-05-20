@@ -51,13 +51,10 @@ async def enrich_movie_metadata(movie: dict, use_backdrops: bool = False) -> dic
             try:
                 palette_result = await process_palette_extraction(movie_id, image_urls)
                 if palette_result:
-                    if use_backdrops:
-                        movie["palette"] = [
-                            {"hex": p["hex"], "name": getColorName(p["hex"]), "percentage": p["percentage"]}
-                            for p in palette_result["palette"]
-                        ]
-                    else:
-                        movie["palette"] = [p["hex"] for p in palette_result["palette"]]
+                    movie["palette"] = [
+                        {"hex": p["hex"], "name": getColorName(p["hex"]), "percentage": p["percentage"]}
+                        for p in palette_result["palette"]
+                    ]
                     movie["dominant_color"] = palette_result["dominant_color"]
             except Exception:
                 pass
@@ -72,13 +69,29 @@ async def enrich_movie_metadata(movie: dict, use_backdrops: bool = False) -> dic
 async def get_movies(
     page: int = Query(1, ge=1),
     search: Optional[str] = Query(None),
+    filter: Optional[str] = Query(None),
+    genre: Optional[str] = Query(None),
 ):
     """
-    Récupère les films et les enrichit. Utilise les vraies infos de pagination de TMDB.
+    Récupère les films et les enrichit. Supporte recherche, filtres (Populaire, Tendance, Récent) et genres.
     """
     try:
         if search:
             response = await tmdb_client.search_movies(search, page=page)
+        elif genre:
+            # On récupère d'abord les IDs de genres pour mapper le nom
+            tmdb_genres = await tmdb_client.get_genres()
+            genre_id = next((g["id"] for g in tmdb_genres if g["name"].lower() == genre.lower()), None)
+            if genre_id:
+                response = await tmdb_client.get_movies_by_genre(genre_id, page=page)
+            else:
+                response = {"results": [], "total_pages": 0, "total_results": 0}
+        elif filter == "Populaire":
+            response = await tmdb_client.get_popular_movies(page=page)
+        elif filter == "Tendance":
+            response = await tmdb_client.get_trending_movies(page=page)
+        elif filter == "Récent":
+            response = await tmdb_client.get_upcoming_movies(page=page)
         else:
             response = await tmdb_client.get_popular_movies(page=page)
         

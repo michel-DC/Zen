@@ -16,5 +16,5 @@ async def process_palette_extraction(movie_id: int, image_urls: list[str]):
     # 3. Fusion
     merged = merge_palettes(all_colors)
     
-    # 4. Top 5 et Formatage
-    return format_palette_response(movie_id, merged[:5])
+    # 4. Top 6 et Formatage
+    return format_palette_response(movie_id, merged[:6])

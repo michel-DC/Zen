@@ -27,13 +27,15 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
 
 export default function Header() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchValue, setSearchValue] = useState(searchParams.get("search") || "");
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") || "",
+  );
 
   const genres = [
     { label: "Action", icon: Clapperboard, iconClass: "text-red-500" },
@@ -49,9 +51,14 @@ export default function Header() {
   ];
 
   const filters = ["Récent", "Populaire", "Tendance"];
-  const [selectedFilter, setSelectedFilter] = useState("Récent");
-  const firstGenre = genres[0];
-  const FirstGenreIcon = firstGenre.icon;
+  const [selectedFilter, setSelectedFilter] = useState(
+    searchParams.get("filter") || "Récent",
+  );
+
+  const currentGenreLabel = searchParams.get("genre") || "";
+  const activeGenre =
+    genres.find((g) => g.label === currentGenreLabel) || genres[0];
+  const ActiveGenreIcon = activeGenre.icon;
 
   const [mounted, setMounted] = useState(false);
 
@@ -60,18 +67,44 @@ export default function Header() {
   }, []);
 
   /**
+   * Met à jour l'URL avec les nouveaux paramètres
+   */
+  const updateUrl = useCallback(
+    (paramsUpdates: Record<string, string | null>) => {
+      const params = new URLSearchParams(window.location.search);
+
+      Object.entries(paramsUpdates).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+      });
+
+      params.set("page", "1");
+      router.push(`/?${params.toString()}`);
+    },
+    [router],
+  );
+
+  const handleFilterChange = (filter: string) => {
+    setSelectedFilter(filter);
+    updateUrl({ filter, genre: null, search: null });
+  };
+
+  const handleGenreChange = (genreLabel: string) => {
+    updateUrl({ genre: genreLabel, filter: null, search: null });
+  };
+
+  /**
    * Met à jour l'URL avec la valeur de recherche (Debounced)
    */
-  const performSearch = useCallback((value: string) => {
-    const params = new URLSearchParams(window.location.search);
-    if (value) {
-      params.set("search", value);
-    } else {
-      params.delete("search");
-    }
-    params.set("page", "1");
-    router.push(`/?${params.toString()}`);
-  }, [router]);
+  const performSearch = useCallback(
+    (value: string) => {
+      updateUrl({ search: value, filter: null, genre: null });
+    },
+    [updateUrl],
+  );
 
   // Effet de Debounce pour la recherche dynamique
   useEffect(() => {
@@ -150,7 +183,7 @@ export default function Header() {
                 {filters.map((filter) => (
                   <DropdownMenuItem
                     key={filter}
-                    onClick={() => setSelectedFilter(filter)}
+                    onClick={() => handleFilterChange(filter)}
                     className="flex items-center justify-between rounded-md px-3 py-2"
                   >
                     <span>{filter}</span>
@@ -170,13 +203,13 @@ export default function Header() {
                 className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 p-0 md:pl-3 md:pr-3"
               >
                 <span className="mr-1 flex h-6 w-6 items-center justify-center">
-                  <FirstGenreIcon
-                    className={`h-4 w-4 ${firstGenre.iconClass}`}
+                  <ActiveGenreIcon
+                    className={`h-4 w-4 ${activeGenre.iconClass}`}
                   />
                 </span>
-                <span className="hidden md:block">{firstGenre.label}</span>
+                <span className="hidden md:block">{activeGenre.label}</span>
                 <span className="md:hidden font-semibold text-foreground">
-                  {firstGenre.label}
+                  {activeGenre.label}
                 </span>
                 <ChevronDown className="ml-2 h-4 w-4" />
               </button>
@@ -185,7 +218,11 @@ export default function Header() {
               {genres.map((genre) => {
                 const Icon = genre.icon;
                 return (
-                  <DropdownMenuItem key={genre.label} className="py-1.5">
+                  <DropdownMenuItem
+                    key={genre.label}
+                    className="py-1.5"
+                    onClick={() => handleGenreChange(genre.label)}
+                  >
                     <Icon className={`mr-1.5 h-4 w-4 ${genre.iconClass}`} />
                     <span>{genre.label}</span>
                   </DropdownMenuItem>

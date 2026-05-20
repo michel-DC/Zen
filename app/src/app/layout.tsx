@@ -1,8 +1,10 @@
 import Header from "@/components/layout/header";
 import { LoadingLineProvider } from "@/components/layout/loading-line-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Zen",
@@ -26,10 +28,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <LoadingLineProvider>
-            <Header />
-            {children}
-          </LoadingLineProvider>
+          <Suspense fallback={null}>
+            <LoadingLineProvider>
+              <Header />
+              {children}
+              <Toaster position="bottom-center" />
+            </LoadingLineProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

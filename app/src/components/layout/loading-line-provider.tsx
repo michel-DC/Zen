@@ -97,33 +97,45 @@ export function LoadingLineProvider({
         return;
       }
 
+      const href = link.getAttribute("href");
+
+      // Vérifier si c'est un lien interne
+      if (
+        !href ||
+        href.startsWith("#") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:")
+      ) {
+        return;
+      }
+
+      // Si le lien a un target, on laisse le navigateur gérer
       if (link.target && link.target !== "_self") {
         return;
       }
 
+      // Si c'est un téléchargement
       if (link.hasAttribute("download")) {
         return;
       }
 
-      const href = link.getAttribute("href");
+      try {
+        const nextUrl = new URL(link.href, window.location.href);
+        const currentUrl = new URL(window.location.href);
 
-      if (!href || href.startsWith("#")) {
-        return;
-      }
+        if (nextUrl.origin !== currentUrl.origin) {
+          return;
+        }
 
-      const nextUrl = new URL(link.href, window.location.href);
+        const hasRealNavigation =
+          nextUrl.pathname !== currentUrl.pathname ||
+          nextUrl.search !== currentUrl.search;
 
-      if (nextUrl.origin !== window.location.origin) {
-        return;
-      }
-
-      const currentUrl = new URL(window.location.href);
-      const hasRealNavigation =
-        nextUrl.pathname !== currentUrl.pathname ||
-        nextUrl.search !== currentUrl.search;
-
-      if (hasRealNavigation) {
-        startLoading();
+        if (hasRealNavigation) {
+          startLoading();
+        }
+      } catch (e) {
+        // En cas d'URL invalide
       }
     };
 

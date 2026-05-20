@@ -9,15 +9,14 @@ export interface Movie {
   director: string | null;
   poster_path: string;
   dominant_color: string | null;
-  palette: string[];
-}
-
-export interface DetailedMovie extends Omit<Movie, "palette"> {
   palette: {
     hex: string;
     name: string;
     percentage: number;
   }[];
+}
+
+export interface DetailedMovie extends Movie {
   genres: string[];
   cast: {
     name: string;
@@ -44,11 +43,15 @@ export const movieApi = {
     page = 1,
     limit = 32,
     search?: string,
+    filter?: string,
+    genre?: string,
   ): Promise<PaginatedResponse<Movie>> {
     const url = new URL(`${API_BASE_URL}/movies`);
     url.searchParams.append("page", page.toString());
     url.searchParams.append("limit", limit.toString());
     if (search) url.searchParams.append("search", search);
+    if (filter) url.searchParams.append("filter", filter);
+    if (genre) url.searchParams.append("genre", genre);
 
     const response = await fetch(url.toString());
     if (!response.ok) throw new Error("Failed to fetch movies");

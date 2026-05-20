@@ -1,6 +1,8 @@
 "use client";
 
+import { useLoadingLine } from "@/components/layout/loading-line-provider";
 import MovieCard from "@/components/movie-card";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -9,51 +11,65 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Button } from "@/components/ui/button";
-import { useLoadingLine } from "@/components/layout/loading-line-provider";
 import { movieApi, type Movie } from "@/lib/services/movie-api";
-import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, Home } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 
 export default function MovieGrid() {
   const { runAfterLoading } = useLoadingLine();
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const searchQuery = searchParams.get("search") || "";
+  const currentFilter = searchParams.get("filter") || "Récent";
+  const currentGenre = searchParams.get("genre") || "";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  
+
   const [movies, setMovies] = React.useState<Movie[]>([]);
   const [totalPages, setTotalPages] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const fetchMovies = React.useCallback(async (targetPage: number, query?: string) => {
-    try {
-      setIsLoading(true);
-      setMovies([]); // Reset pour afficher les skeletons
-      
-      const response = await movieApi.getMovies(targetPage, 32, query);
-      setMovies(response.data);
-      setTotalPages(response.pagination.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch movies:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const fetchMovies = React.useCallback(
+    async (
+      targetPage: number,
+      query?: string,
+      filter?: string,
+      genre?: string,
+    ) => {
+      try {
+        setIsLoading(true);
+        setMovies([]); // Reset pour afficher les skeletons
 
-  // Déclenché quand le texte de recherche OU la page change dans l'URL
+        const response = await movieApi.getMovies(
+          targetPage,
+          32,
+          query,
+          filter,
+          genre,
+        );
+        setMovies(response.data);
+        setTotalPages(response.pagination.total_pages);
+      } catch (error) {
+        console.error("Failed to fetch movies:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  // Déclenché quand le texte de recherche, filtre, genre OU la page change dans l'URL
   React.useEffect(() => {
-    fetchMovies(currentPage, searchQuery);
-  }, [fetchMovies, searchQuery, currentPage]);
+    fetchMovies(currentPage, searchQuery, currentFilter, currentGenre);
+  }, [fetchMovies, searchQuery, currentFilter, currentGenre, currentPage]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
 
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
-    
+
     runAfterLoading(async () => {
       router.push(`/?${params.toString()}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -70,15 +86,9 @@ export default function MovieGrid() {
   if (isLoading && movies.length === 0) {
     return (
       <section className="max-w-full mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-10 opacity-50">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-10">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-3">
-               <div className="aspect-[2/3] bg-foreground/10 animate-pulse rounded-md" />
-               <div className="space-y-2">
-                 <div className="h-4 w-3/4 bg-foreground/10 animate-pulse rounded" />
-                 <div className="h-3 w-1/2 bg-foreground/10 animate-pulse rounded" />
-               </div>
-            </div>
+            <MovieCard.Skeleton key={i} />
           ))}
         </div>
       </section>
@@ -90,13 +100,25 @@ export default function MovieGrid() {
       {movies.length === 0 && !isLoading ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="bg-muted rounded-full p-6 mb-4">
-            <svg className="w-12 h-12 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="w-12 h-12 text-muted-foreground"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </div>
           <h3 className="text-xl font-semibold">Aucun résultat</h3>
-          <p className="text-muted-foreground mt-2">Nous n'avons trouvé aucun film correspondant à "{searchQuery}"</p>
-          <Button 
+          <p className="text-muted-foreground mt-2">
+            Nous n'avons trouvé aucun film correspondant à "{searchQuery}"
+          </p>
+          <Button
             variant="outline"
             onClick={resetSearch}
             className="mt-8 gap-2"
@@ -138,9 +160,23 @@ export default function MovieGrid() {
                   {Array.from({ length: totalPages }).map((_, idx) => {
                     const num = idx + 1;
                     if (totalPages > 7) {
-                      if (num > 1 && num < totalPages && (num < currentPage - 1 || num > currentPage + 1)) {
-                        if (num === currentPage - 2 || num === currentPage + 2) {
-                           return <PaginationItem key={num} className="hidden sm:inline-block">...</PaginationItem>;
+                      if (
+                        num > 1 &&
+                        num < totalPages &&
+                        (num < currentPage - 1 || num > currentPage + 1)
+                      ) {
+                        if (
+                          num === currentPage - 2 ||
+                          num === currentPage + 2
+                        ) {
+                          return (
+                            <PaginationItem
+                              key={num}
+                              className="hidden sm:inline-block"
+                            >
+                              ...
+                            </PaginationItem>
+                          );
                         }
                         return null;
                       }
@@ -175,11 +211,7 @@ export default function MovieGrid() {
               </Pagination>
             ) : searchQuery ? (
               // Si une seule page en mode recherche, on affiche le bouton retour
-              <Button 
-                variant="outline"
-                onClick={resetSearch}
-                className="gap-2"
-              >
+              <Button variant="outline" onClick={resetSearch} className="gap-2">
                 <Home className="w-4 h-4" />
                 Retour à l'accueil
               </Button>
