@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from core.config import settings
 from core.logging import setup_logging
-from routers import movies, palette
+from routers import catalog, movies, palette
 
 setup_logging()
 
@@ -28,9 +28,11 @@ def on_startup():
     print(f"PROJECT: {settings.PROJECT_NAME}")
     print(f"TMDB_KEY: {'SET' if settings.TMDB_API_KEY else 'MISSING'}")
     print(f"MODE: DIRECT BRIDGE (NO DB)")
+    print(f"R2_BUCKET: {settings.CLOUDFLARE_R2_BUCKET_NAME or 'MISSING'}")
     print(f"------------------------------")
 
 
+app.include_router(catalog.router, prefix="/api/v1")
 app.include_router(palette.router, prefix="/api/v1")
 app.include_router(movies.router, prefix="/api/v1")
 

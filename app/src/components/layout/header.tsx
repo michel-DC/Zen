@@ -137,7 +137,7 @@ export default function Header() {
   if (!mounted) return null;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/60 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-transparent dark:border-border dark:bg-background/60 dark:backdrop-blur-xl">
       <div className="flex h-15 items-center gap-4 px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image

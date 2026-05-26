@@ -20,6 +20,17 @@ class Settings(BaseSettings):
     # CORS Settings
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 
+    # Cloudflare R2 Settings
+    CLOUDFLARE_R2_ACCOUNT_ID: str = ""
+    CLOUDFLARE_R2_ACCESS_KEY_ID: str = ""
+    CLOUDFLARE_R2_SECRET_ACCESS_KEY: str = ""
+    CLOUDFLARE_R2_BUCKET_NAME: str = ""
+    CLOUDFLARE_R2_CATALOG_KEY: str = "catalog.json"
+    CLOUDFLARE_R2_ENDPOINT_URL: str = ""
+
+    # Admin Settings
+    CATALOG_ADMIN_TOKEN: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,

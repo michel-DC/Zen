@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getColorName } from "@/lib/color-names";
+import { catalogApi } from "@/lib/services/catalog-api";
 import { Copy } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 
 type MovieCardProps = {
@@ -21,6 +23,8 @@ type MovieCardProps = {
   title: string;
   author: string;
   palette?: (string | { hex: string; name: string; percentage: number })[];
+  isInCatalog?: boolean;
+  onAddedToCatalog?: (movieId: number) => void;
 };
 
 export function MovieCard({
@@ -29,6 +33,8 @@ export function MovieCard({
   title,
   author,
   palette = [],
+  isInCatalog = false,
+  onAddedToCatalog,
 }: MovieCardProps) {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -43,11 +49,36 @@ export function MovieCard({
       : col,
   );
 
+  const pathname = usePathname();
+
+  const handleAddToCatalog = async () => {
+    try {
+      const payload = {
+        title,
+        release_year: null,
+        director: author || null,
+        overview: null,
+        poster_url: image || null,
+        tmdb_id: id || null,
+        genres: [],
+        watched_at: null,
+        rating: null,
+        favorite: false,
+        notes: null,
+      };
+      await catalogApi.createMovie(payload);
+      onAddedToCatalog?.(id);
+      toast.success("Film ajouté au catalogue");
+    } catch (err: any) {
+      toast.error(err?.message || "Impossible d'ajouter au catalogue");
+    }
+  };
+
   return (
     <article className="group relative flex flex-col bg-transparent rounded-md">
       <Link
         href={`/movies/${id}`}
-        className="relative overflow-hidden rounded-xl transition-all group-hover:ring-1 group-hover:ring-foreground/50 block aspect-[2/3] shadow-sm hover:shadow-md"
+        className="relative block aspect-2/3 overflow-hidden rounded-xl shadow-sm transition-all hover:shadow-md group-hover:ring-1 group-hover:ring-foreground/50"
       >
         <Image
           src={image}
@@ -66,6 +97,21 @@ export function MovieCard({
             </h3>
           </Link>
           <p className="text-xs text-muted-foreground mt-1">Par {author}</p>
+          {pathname === "/app" && (
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={handleAddToCatalog}
+                disabled={isInCatalog}
+                aria-disabled={isInCatalog}
+                className="text-xs px-3 py-1 rounded-full bg-foreground/10 text-foreground/90 transition-colors disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-foreground/10 hover:bg-foreground/20"
+              >
+                {isInCatalog
+                  ? "Déjà dans le catalogue"
+                  : "Ajouter au catalogue"}
+              </button>
+            </div>
+          )}
         </div>
 
         {normalizedPalette.length > 0 && (
@@ -81,7 +127,7 @@ export function MovieCard({
                     key={i}
                     aria-hidden
                     style={{ backgroundColor: col.hex }}
-                    className="rounded-full w-3 h-3 border border-background shadow-sm first:z-30 [&:nth-child(2)]:z-20 [&:nth-child(3)]:z-10"
+                    className="rounded-full w-3 h-3 border border-background shadow-sm first:z-30 nth-2:z-20 nth-3:z-10"
                   />
                 ))}
               </button>
@@ -138,7 +184,7 @@ export function MovieCard({
 MovieCard.Skeleton = function MovieCardSkeleton() {
   return (
     <div className="flex flex-col gap-3">
-      <Skeleton className="aspect-[2/3] w-full rounded-xl" />
+      <Skeleton className="aspect-2/3 w-full rounded-xl" />
       <div className="space-y-2 px-1">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-3 w-1/2" />

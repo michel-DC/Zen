@@ -8,3 +8,19 @@ class NoImagesDownloadedError(PaletteError):
 
 class PaletteExtractionError(PaletteError):
     pass
+
+
+class CatalogError(Exception):
+    pass
+
+
+class CatalogConfigurationError(CatalogError):
+    pass
+
+
+class CatalogStorageError(CatalogError):
+    pass
+
+
+class CatalogAuthenticationError(CatalogError):
+    pass
