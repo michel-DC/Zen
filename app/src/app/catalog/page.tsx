@@ -64,7 +64,6 @@ export default function CatalogPage() {
               image={m.poster_url || "/icons/favicon.png"}
               title={m.title}
               author={m.director || "Inconnu"}
-              palette={m.palette || []}
             />
           ))}
         </div>
