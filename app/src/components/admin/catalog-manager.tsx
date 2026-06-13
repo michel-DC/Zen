@@ -5,11 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { catalogApi, type CatalogMovie } from "@/lib/services/catalog-api";
 import { movieApi, type Movie } from "@/lib/services/movie-api";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clapperboard, Search, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-
-const DEBOUNCE_DELAY = 350;
+import { toast } from "sonner";
 
 export default function CatalogManager() {
   const [query, setQuery] = useState("");
@@ -85,9 +84,17 @@ export default function CatalogManager() {
     try {
       const response = await movieApi.getMovies(1, 24, value);
       setMovies(response.data);
+      if (response.data.length === 0) {
+        toast.info("Aucun film trouvé", {
+          description: `Aucun résultat ne correspond à "${value}".`,
+        });
+      }
     } catch (error) {
       console.error("Failed to search movies:", error);
       setMovies([]);
+      toast.error("La recherche a échoué", {
+        description: "Impossible de récupérer les films pour le moment.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -96,21 +103,44 @@ export default function CatalogManager() {
   return (
     <main className="flex min-h-[calc(100vh-4rem)] items-center px-4 py-6 sm:px-6 lg:px-8">
       <section className="mx-auto flex w-full max-w-full -translate-y-2 flex-col items-center gap-10 sm:-translate-y-2 lg:-translate-y-2">
-        <div className="relative w-full max-w-4xl rounded-3xl border border-white/10 bg-black/10 p-1 shadow-2xl backdrop-blur-2xl transition-all hover:bg-black/20 dark:bg-black/40 dark:hover:bg-black/50">
-          <ArrowRight className="pointer-events-none absolute left-6 top-1/2 size-8 -translate-y-1/2 text-black opacity-80 dark:text-white" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                doSearch(query);
-              }
-            }}
-            placeholder="Rechercher"
-            autoComplete="off"
-            className="h-16 rounded-2xl border-0 bg-transparent pl-16 pr-6 font-mono text-3xl font-light tracking-tight text-foreground/90 shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0 sm:h-20 sm:text-5xl"
-          />
+        <div className="w-full max-w-4xl space-y-3">
+          {!normalizedQuery ? (
+            <div className="flex flex-col items-center gap-3 px-1 text-center">
+              <div className="space-y-2">
+                <p className="text-base font-medium tracking-tight text-foreground sm:text-lg">
+                  Cherche un film, explore les résultats, puis ajoute-le à ton
+                  catalogue.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground sm:text-sm">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2.5 py-1 dark:bg-white/8">
+                    <Search className="size-3.5" />
+                    Recherche instantanée
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2.5 py-1 dark:bg-white/8">
+                    <Clapperboard className="size-3.5" />
+                    Ajout en un clic
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="relative rounded-3xl border border-white/10 bg-black/10 p-1 shadow-2xl backdrop-blur-2xl transition-all hover:bg-black/20 dark:bg-black/40 dark:hover:bg-black/50">
+            <ArrowRight className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-black opacity-80 dark:text-white sm:left-6 sm:size-8" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  doSearch(query);
+                }
+              }}
+              placeholder="Rechercher"
+              autoComplete="off"
+              className="h-14 rounded-2xl border-0 bg-transparent pl-12 pr-4 text-xl font-light tracking-tight text-foreground/90 shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0 sm:h-20 sm:pl-16 sm:pr-6 sm:text-5xl"
+            />
+          </div>
         </div>
 
         <Link

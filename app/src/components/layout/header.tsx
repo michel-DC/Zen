@@ -26,12 +26,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState(
     searchParams.get("search") || "",
@@ -135,6 +136,27 @@ export default function Header() {
   };
 
   if (!mounted) return null;
+
+  if (pathname === "/app" || pathname === "/catalog") {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-transparent dark:border-border dark:bg-background/60 dark:backdrop-blur-xl">
+        <div className="relative flex h-15 items-center justify-center px-8">
+          <Link href="/app" className="flex items-center gap-2">
+            <Image
+              src="/icons/favicon.png"
+              alt="Zen"
+              width={26}
+              height={26}
+              className="h-8 w-8"
+            />
+            <span className="text-lg font-semibold text-foreground">Zen</span>
+          </Link>
+        </div>
+
+        <HeaderLoadingLine />
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-transparent dark:border-border dark:bg-background/60 dark:backdrop-blur-xl">
