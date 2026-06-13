@@ -5,6 +5,8 @@ from threading import Lock
 from uuid import uuid4
 
 import boto3
+from botocore.config import Config
+from botocore.exceptions import BotoCoreError
 from botocore.exceptions import ClientError
 
 from core.config import settings
@@ -44,6 +46,11 @@ class R2CatalogStore:
             endpoint_url=endpoint_url,
             aws_access_key_id=settings.CLOUDFLARE_R2_ACCESS_KEY_ID,
             aws_secret_access_key=settings.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+            config=Config(
+                connect_timeout=settings.CLOUDFLARE_R2_CONNECT_TIMEOUT,
+                read_timeout=settings.CLOUDFLARE_R2_READ_TIMEOUT,
+                retries={"max_attempts": settings.CLOUDFLARE_R2_MAX_RETRIES, "mode": "standard"},
+            ),
         )
         self._lock = Lock()
 
@@ -58,6 +65,8 @@ class R2CatalogStore:
             if error_code in {"NoSuchKey", "404", "NotFound"}:
                 return self._empty_document()
             raise CatalogStorageError(str(error)) from error
+        except BotoCoreError as error:
+            raise CatalogStorageError("R2 catalog storage is unreachable") from error
 
         body = response["Body"].read().decode("utf-8")
         if not body.strip():
@@ -79,6 +88,8 @@ class R2CatalogStore:
             )
         except ClientError as error:
             raise CatalogStorageError(str(error)) from error
+        except BotoCoreError as error:
+            raise CatalogStorageError("R2 catalog storage is unreachable") from error
 
         return document
 

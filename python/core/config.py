@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     CLOUDFLARE_R2_BUCKET_NAME: str = ""
     CLOUDFLARE_R2_CATALOG_KEY: str = "catalog.json"
     CLOUDFLARE_R2_ENDPOINT_URL: str = ""
+    CLOUDFLARE_R2_CONNECT_TIMEOUT: int = 5
+    CLOUDFLARE_R2_READ_TIMEOUT: int = 10
+    CLOUDFLARE_R2_MAX_RETRIES: int = 1
 
     # Admin Settings
     CATALOG_ADMIN_TOKEN: str = ""

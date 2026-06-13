@@ -15,10 +15,18 @@ class TMDBClient:
         params["api_key"] = self.api_key
         params["language"] = "fr-FR"
         params["include_adult"] = "false"
+        timeout = httpx.Timeout(
+            timeout=settings.DOWNLOAD_TIMEOUT,
+            connect=min(settings.DOWNLOAD_TIMEOUT, 5),
+        )
         
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get(f"{self.base_url}{endpoint}", params=params, timeout=10)
+                response = await client.get(
+                    f"{self.base_url}{endpoint}",
+                    params=params,
+                    timeout=timeout,
+                )
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPStatusError as e:
