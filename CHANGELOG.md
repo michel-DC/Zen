@@ -7,3 +7,4 @@
 - 10:56 Ajustement de la page `/catalog` pour réutiliser l'affichage en cards des films avec le bouton de suppression placé sous chaque carte tout en conservant le regroupement par date d'ajout.
 - 10:58 Ajout d'une barre de recherche locale dans la page `/catalog` pour filtrer les films du catalogue par titre ou réalisateur sans quitter la page.
 - 11:01 Mise en place d'un header minimal spécifique aux pages `/app` et `/catalog`, centré sur le logo et le texte `Zen`, avec un lien direct vers `/app`.
+- 11:11 Ajout du socle PWA du frontend avec manifeste, service worker minimal, métadonnées mobiles et icônes dédiées pour permettre l'ajout du site à l'écran d'accueil sur téléphone.
