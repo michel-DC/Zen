@@ -11,8 +11,6 @@ import Link from "next/link";
 import * as React from "react";
 import { toast } from "sonner";
 
-const TOP_STORAGE_KEY = "zen-top-three";
-
 const rankStyles = [
   {
     label: "Top 1",
@@ -33,25 +31,6 @@ const rankStyles = [
     icon: Medal,
   },
 ] as const;
-
-function readTopIds(): Array<string | null> {
-  if (typeof window === "undefined") return [null, null, null];
-
-  try {
-    const raw = window.localStorage.getItem(TOP_STORAGE_KEY);
-    if (!raw) return [null, null, null];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [null, null, null];
-    return [parsed[0] ?? null, parsed[1] ?? null, parsed[2] ?? null];
-  } catch {
-    return [null, null, null];
-  }
-}
-
-function persistTopIds(topIds: Array<string | null>) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(TOP_STORAGE_KEY, JSON.stringify(topIds));
-}
 
 function TopMovieCard({
   movie,
@@ -78,14 +57,14 @@ function TopMovieCard({
         <div className="overflow-hidden rounded-3xl border border-black/10 bg-background shadow-sm dark:border-white/10">
           <Link
             href={movie.tmdb_id ? `/movies/${movie.tmdb_id}` : "/catalog"}
-            className="relative block aspect-[4/5] overflow-hidden"
+            className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-black/[0.04] p-4 dark:bg-white/[0.04]"
           >
             <Image
               src={movie.poster_url || "/icons/favicon.png"}
               alt={movie.title}
               fill
               sizes="(max-width: 768px) 33vw, 25vw"
-              className="object-cover"
+              className="object-contain"
             />
           </Link>
 
@@ -141,10 +120,6 @@ export default function TopPage() {
   ]);
 
   React.useEffect(() => {
-    setTopIds(readTopIds());
-  }, []);
-
-  React.useEffect(() => {
     let mounted = true;
 
     (async () => {
@@ -153,6 +128,11 @@ export default function TopPage() {
         const doc = await catalogApi.getCatalog();
         if (!mounted) return;
         setCatalogMovies(doc.movies || []);
+        setTopIds([
+          doc.top_three?.[0] ?? null,
+          doc.top_three?.[1] ?? null,
+          doc.top_three?.[2] ?? null,
+        ]);
       } catch (error) {
         console.error("Failed to load catalog for top page:", error);
         if (mounted) setCatalogMovies([]);
@@ -193,17 +173,36 @@ export default function TopPage() {
     }
 
     nextTopIds[rankIndex] = movieId;
-    setTopIds(nextTopIds);
-    persistTopIds(nextTopIds);
-
-    toast.success(`Film placé en ${rankStyles[rankIndex].label.toLowerCase()}`);
+    void saveTopIds(nextTopIds, `Film placé en ${rankStyles[rankIndex].label.toLowerCase()}`);
   };
 
   const removeMovieFromRank = (rankIndex: number) => {
     const nextTopIds = [...topIds];
     nextTopIds[rankIndex] = null;
-    setTopIds(nextTopIds);
-    persistTopIds(nextTopIds);
+    void saveTopIds(nextTopIds);
+  };
+
+  const saveTopIds = async (
+    nextTopIds: Array<string | null>,
+    successMessage?: string,
+  ) => {
+    const sanitizedIds = nextTopIds.filter((value): value is string => Boolean(value));
+
+    try {
+      const document = await catalogApi.updateTopThree(sanitizedIds);
+      setTopIds([
+        document.top_three?.[0] ?? null,
+        document.top_three?.[1] ?? null,
+        document.top_three?.[2] ?? null,
+      ]);
+      setCatalogMovies(document.movies || []);
+
+      if (successMessage) {
+        toast.success(successMessage);
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Impossible d'enregistrer le top");
+    }
   };
 
   if (isLoading && catalogMovies.length === 0) {

@@ -88,3 +88,4 @@ class CatalogDocument(BaseModel):
     version: int = 1
     updated_at: datetime
     movies: list[CatalogMovieRecord] = Field(default_factory=list)
+    top_three: list[str] = Field(default_factory=list, max_length=3)

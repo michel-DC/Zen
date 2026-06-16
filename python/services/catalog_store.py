@@ -98,6 +98,22 @@ class R2CatalogStore:
         document.movies.sort(key=lambda movie: movie.created_at, reverse=True)
         return document
 
+    def update_top_three(self, movie_ids: list[str]) -> CatalogDocument:
+        with self._lock:
+            document = self.load()
+            valid_ids = {movie.id for movie in document.movies}
+            sanitized_ids: list[str] = []
+
+            for movie_id in movie_ids[:3]:
+                if movie_id in valid_ids and movie_id not in sanitized_ids:
+                    sanitized_ids.append(movie_id)
+
+            document.top_three = sanitized_ids
+            document.updated_at = _now()
+            self.save(document)
+            document.movies.sort(key=lambda movie: movie.created_at, reverse=True)
+            return document
+
     def create_movie(self, payload: CatalogMovieCreate) -> CatalogMovieRecord:
         with self._lock:
             document = self.load()
@@ -137,6 +153,7 @@ class R2CatalogStore:
             if len(document.movies) == original_length:
                 raise CatalogStorageError("Movie not found")
 
+            document.top_three = [item_id for item_id in document.top_three if item_id != movie_id]
             document.updated_at = _now()
             self.save(document)
 
