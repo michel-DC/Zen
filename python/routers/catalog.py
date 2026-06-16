@@ -35,6 +35,17 @@ def create_movie(payload: CatalogMovieCreate) -> dict:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(error))
 
 
+@router.put("/top")
+def update_top(payload: CatalogTopUpdate) -> dict:
+    try:
+        document = get_catalog_store().update_top_three(payload.movie_ids)
+        return document.model_dump(mode="json")
+    except CatalogConfigurationError as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(error))
+    except CatalogStorageError as error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(error))
+
+
 @router.put("/{movie_id}")
 def update_movie(movie_id: str, payload: CatalogMovieUpdate) -> dict:
     try:
@@ -58,15 +69,4 @@ def delete_movie(movie_id: str) -> dict:
     except CatalogStorageError as error:
         if str(error) == "Movie not found":
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(error))
-
-
-@router.put("/top")
-def update_top(payload: CatalogTopUpdate) -> dict:
-    try:
-        document = get_catalog_store().update_top_three(payload.movie_ids)
-        return document.model_dump(mode="json")
-    except CatalogConfigurationError as error:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(error))
-    except CatalogStorageError as error:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(error))
