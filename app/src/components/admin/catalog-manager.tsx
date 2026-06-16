@@ -143,12 +143,21 @@ export default function CatalogManager() {
           </div>
         </div>
 
-        <Link
-          href="/catalog"
-          className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/10 px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-black/20 dark:bg-white/5 dark:hover:bg-white/10"
-        >
-          Voir mon catalogue
-        </Link>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/catalog"
+            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/10 px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-black/20 dark:bg-white/5 dark:hover:bg-white/10"
+          >
+            Voir mon catalogue
+          </Link>
+
+          <Link
+            href="/top"
+            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-black/10 px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-black/20 dark:bg-white/5 dark:hover:bg-white/10"
+          >
+            Voir mon top 3
+          </Link>
+        </div>
 
         {normalizedQuery ? (
           <div className="w-full">

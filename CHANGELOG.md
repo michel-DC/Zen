@@ -8,3 +8,7 @@
 - 10:58 Ajout d'une barre de recherche locale dans la page `/catalog` pour filtrer les films du catalogue par titre ou réalisateur sans quitter la page.
 - 11:01 Mise en place d'un header minimal spécifique aux pages `/app` et `/catalog`, centré sur le logo et le texte `Zen`, avec un lien direct vers `/app`.
 - 11:11 Ajout du socle PWA du frontend avec manifeste, service worker minimal, métadonnées mobiles et icônes dédiées pour permettre l'ajout du site à l'écran d'accueil sur téléphone.
+
+## 16-06-2026
+
+- 22:10 Création de la page frontend `/top` pour gérer un top 3 de films vus avec affichage en grandes cartes, persistance locale, recherche dans le catalogue et sélection/modification des trois positions du classement.

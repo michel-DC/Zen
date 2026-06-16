@@ -137,7 +137,7 @@ export default function Header() {
 
   if (!mounted) return null;
 
-  if (pathname === "/app" || pathname === "/catalog") {
+  if (pathname === "/app" || pathname === "/catalog" || pathname === "/top") {
     return (
       <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-transparent dark:border-border dark:bg-background/60 dark:backdrop-blur-xl">
         <div className="relative flex h-15 items-center justify-center px-8">
