@@ -1,5 +1,6 @@
 "use client";
 
+import MovieCard from "@/components/movie-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +33,14 @@ const rankStyles = [
   },
 ] as const;
 
+function normalizeTopIds(topThree: Array<string | null> | undefined | null) {
+  return [
+    topThree?.[0] ?? null,
+    topThree?.[1] ?? null,
+    topThree?.[2] ?? null,
+  ] as Array<string | null>;
+}
+
 function TopMovieCard({
   movie,
   rankIndex,
@@ -54,45 +63,27 @@ function TopMovieCard({
       </div>
 
       {movie ? (
-        <div className="overflow-hidden rounded-3xl border border-black/10 bg-background shadow-sm dark:border-white/10">
-          <Link
-            href={movie.tmdb_id ? `/movies/${movie.tmdb_id}` : "/catalog"}
-            className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-black/[0.04] p-4 dark:bg-white/[0.04]"
-          >
-            <Image
-              src={movie.poster_url || "/icons/favicon.png"}
-              alt={movie.title}
-              fill
-              sizes="(max-width: 768px) 33vw, 25vw"
-              className="object-contain"
-            />
-          </Link>
-
-          <div className="space-y-3 p-4">
-            <div className="space-y-1">
-              <h2 className="line-clamp-2 text-lg font-semibold tracking-tight">
-                {movie.title}
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                {movie.director || "Réalisateur inconnu"}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs text-muted-foreground">
-                {movie.release_year || "Année inconnue"}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onRemove}
-                className="rounded-full"
-              >
-                <X className="size-3.5" />
-                Retirer
-              </Button>
-            </div>
+        <div className="flex flex-col gap-3">
+          <MovieCard
+            id={movie.tmdb_id ? Number(movie.tmdb_id) : 0}
+            image={movie.poster_url || "/icons/favicon.png"}
+            title={movie.title}
+            author={movie.director || "Inconnu"}
+          />
+          <div className="flex items-center justify-between gap-3 px-1">
+            <span className="text-xs text-muted-foreground">
+              {movie.release_year || "Année inconnue"}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onRemove}
+              className="rounded-full"
+            >
+              <X className="size-3.5" />
+              Retirer
+            </Button>
           </div>
         </div>
       ) : (
@@ -128,11 +119,7 @@ export default function TopPage() {
         const doc = await catalogApi.getCatalog();
         if (!mounted) return;
         setCatalogMovies(doc.movies || []);
-        setTopIds([
-          doc.top_three?.[0] ?? null,
-          doc.top_three?.[1] ?? null,
-          doc.top_three?.[2] ?? null,
-        ]);
+        setTopIds(normalizeTopIds(doc.top_three));
       } catch (error) {
         console.error("Failed to load catalog for top page:", error);
         if (mounted) setCatalogMovies([]);
@@ -186,15 +173,9 @@ export default function TopPage() {
     nextTopIds: Array<string | null>,
     successMessage?: string,
   ) => {
-    const sanitizedIds = nextTopIds.filter((value): value is string => Boolean(value));
-
     try {
-      const document = await catalogApi.updateTopThree(sanitizedIds);
-      setTopIds([
-        document.top_three?.[0] ?? null,
-        document.top_three?.[1] ?? null,
-        document.top_three?.[2] ?? null,
-      ]);
+      const document = await catalogApi.updateTopThree(normalizeTopIds(nextTopIds));
+      setTopIds(normalizeTopIds(document.top_three));
       setCatalogMovies(document.movies || []);
 
       if (successMessage) {

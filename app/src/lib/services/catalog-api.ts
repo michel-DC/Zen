@@ -21,7 +21,7 @@ export type CatalogDocument = {
   version: number;
   updated_at: string;
   movies: CatalogMovie[];
-  top_three: string[];
+  top_three: Array<string | null>;
 };
 
 export type CatalogMoviePayload = {
@@ -52,7 +52,7 @@ export const catalogApi = {
     return parseResponse<CatalogDocument>(response);
   },
 
-  async updateTopThree(movieIds: string[]): Promise<CatalogDocument> {
+  async updateTopThree(movieIds: Array<string | null>): Promise<CatalogDocument> {
     const response = await fetch(`${API_BASE_URL}/catalog/top`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

@@ -10,7 +10,11 @@ router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 
 class CatalogTopUpdate(BaseModel):
-    movie_ids: list[str] = Field(default_factory=list, max_length=3)
+    movie_ids: list[str | None] = Field(
+        default_factory=lambda: [None, None, None],
+        min_length=3,
+        max_length=3,
+    )
 
 
 @router.get("")

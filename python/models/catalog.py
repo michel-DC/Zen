@@ -10,6 +10,32 @@ def _clean_text(value: str | None) -> str | None:
     return cleaned or None
 
 
+def _empty_top_three() -> list[str | None]:
+    return [None, None, None]
+
+
+def _normalize_top_three(value: object) -> list[str | None]:
+    if not isinstance(value, list):
+        return _empty_top_three()
+
+    normalized: list[str | None] = []
+    seen: set[str] = set()
+
+    for item in value[:3]:
+        if isinstance(item, str):
+            cleaned = item.strip()
+            if cleaned and cleaned not in seen:
+                normalized.append(cleaned)
+                seen.add(cleaned)
+                continue
+        normalized.append(None)
+
+    while len(normalized) < 3:
+        normalized.append(None)
+
+    return normalized
+
+
 class CatalogMovieBase(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     release_year: int | None = Field(default=None, ge=1888, le=2100)
@@ -88,4 +114,13 @@ class CatalogDocument(BaseModel):
     version: int = 1
     updated_at: datetime
     movies: list[CatalogMovieRecord] = Field(default_factory=list)
-    top_three: list[str] = Field(default_factory=list, max_length=3)
+    top_three: list[str | None] = Field(
+        default_factory=_empty_top_three,
+        min_length=3,
+        max_length=3,
+    )
+
+    @field_validator("top_three", mode="before")
+    @classmethod
+    def normalize_top_three(cls, value: object) -> list[str | None]:
+        return _normalize_top_three(value)

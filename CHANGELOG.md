@@ -14,3 +14,6 @@
 - 22:10 Création de la page frontend `/top` pour gérer un top 3 de films vus avec affichage en grandes cartes, persistance locale, recherche dans le catalogue et sélection/modification des trois positions du classement.
 - 22:19 Migration du top 3 vers un stockage persistant dans le document catalogue sur R2 avec ajout d'une route backend dédiée et branchement complet du frontend `/top` sur cette persistance serveur.
 - 22:25 Correction du backend catalogue pour faire passer la route `PUT /catalog/top` avant la route dynamique `PUT /catalog/{movie_id}` et éviter que l'ajout au top soit interprété comme une mise à jour du film `top`.
+- 22:30 Ajustement visuel de la carte de la page `/top` pour afficher l'affiche du film en pleine largeur dans la zone image tout en conservant son intégralité.
+- 22:32 Ajustement final de la carte `/top` pour forcer l'affiche à remplir toute la largeur du visuel sans bandes latérales.
+- 22:36 Correction complète de la logique du top 3 avec conservation stricte des positions vides ou occupées, persistance backend sur trois slots fixes et réutilisation exacte des cartes film de la page `/catalog` dans `/top`.
