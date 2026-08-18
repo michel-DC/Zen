@@ -6,7 +6,7 @@ export interface Movie {
   overview: string;
   release_year: number | null;
   director: string | null;
-  poster_path: string;
+  poster_path: string | null;
   dominant_color: string | null;
   palette: {
     hex: string;

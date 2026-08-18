@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from threading import Lock
 from uuid import uuid4
 
@@ -96,7 +96,65 @@ class R2CatalogStore:
     def list_movies(self) -> CatalogDocument:
         document = self.load()
         document.movies.sort(key=lambda movie: movie.created_at, reverse=True)
+        document.watchlist.sort(key=lambda movie: movie.created_at, reverse=True)
         return document
+
+    def create_watchlist_movie(self, payload: CatalogMovieCreate) -> CatalogMovieRecord:
+        with self._lock:
+            document = self.load()
+            if payload.tmdb_id and any(
+                movie.tmdb_id == payload.tmdb_id for movie in [*document.movies, *document.watchlist]
+            ):
+                raise CatalogStorageError("Movie already exists in the catalog or watchlist")
+
+            now = _now()
+            movie = CatalogMovieRecord(
+                id=str(uuid4()), created_at=now, updated_at=now, **payload.model_dump()
+            )
+            document.watchlist.insert(0, movie)
+            document.updated_at = now
+            self.save(document)
+            return movie
+
+    def mark_watchlist_movie_as_watched(self, movie_id: str) -> CatalogMovieRecord:
+        with self._lock:
+            document = self.load()
+            movie = next((item for item in document.watchlist if item.id == movie_id), None)
+            if movie is None:
+                raise CatalogStorageError("Watchlist movie not found")
+
+            document.watchlist = [item for item in document.watchlist if item.id != movie_id]
+            existing = next(
+                (item for item in document.movies if item.tmdb_id and item.tmdb_id == movie.tmdb_id), None
+            )
+            if existing is None:
+                movie.watched_at = date.today()
+                movie.updated_at = _now()
+                document.movies.insert(0, movie)
+                result = movie
+            else:
+                result = existing
+            document.updated_at = _now()
+            self.save(document)
+            return result
+
+    def delete_watchlist_movie(self, movie_id: str) -> None:
+        with self._lock:
+            document = self.load()
+            original_length = len(document.watchlist)
+            document.watchlist = [movie for movie in document.watchlist if movie.id != movie_id]
+            if len(document.watchlist) == original_length:
+                raise CatalogStorageError("Watchlist movie not found")
+            document.updated_at = _now()
+            self.save(document)
+
+    def reject_recommendation(self, tmdb_id: int) -> None:
+        with self._lock:
+            document = self.load()
+            if tmdb_id not in document.rejected_recommendation_tmdb_ids:
+                document.rejected_recommendation_tmdb_ids.append(tmdb_id)
+                document.updated_at = _now()
+                self.save(document)
 
     def update_top_three(self, movie_ids: list[str | None]) -> CatalogDocument:
         with self._lock:

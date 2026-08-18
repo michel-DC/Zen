@@ -7,7 +7,8 @@ RUN npm install -g pnpm
 
 # Copy workspace configuration and locks
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY .env ./
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Copy the app source
 COPY . .

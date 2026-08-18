@@ -1,0 +1,24 @@
+[
+  {
+    "case": "youth_18x2_to_last_10_years",
+    "source_tmdb_id": 1188258,
+    "target_tmdb_id": 876797,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 876797,
+        "title": "The Last 10 Years"
+      },
+      {
+        "tmdb_id": 758866,
+        "title": "Drive My Car"
+      },
+      {
+        "tmdb_id": 523781,
+        "title": "Des Mots sur les murs"
+      }
+    ],
+    "candidate_count": 176
+  }
+]

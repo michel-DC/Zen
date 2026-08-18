@@ -15,6 +15,7 @@ export default function CatalogManager() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [catalogMovies, setCatalogMovies] = useState<CatalogMovie[]>([]);
+  const [watchlistMovies, setWatchlistMovies] = useState<CatalogMovie[]>([]);
 
   const normalizedQuery = useMemo(() => query.trim(), [query]);
   const catalogTmdbIds = useMemo(() => {
@@ -24,6 +25,7 @@ export default function CatalogManager() {
         .filter((id): id is number => Boolean(id)),
     );
   }, [catalogMovies]);
+  const watchlistTmdbIds = useMemo(() => new Set(watchlistMovies.map((movie) => movie.tmdb_id).filter((id): id is number => Boolean(id))), [watchlistMovies]);
 
   const handleAddedToCatalog = (movieId: number) => {
     setCatalogMovies((currentMovies) => {
@@ -61,6 +63,7 @@ export default function CatalogManager() {
         const document = await catalogApi.getCatalog();
         if (mounted) {
           setCatalogMovies(document.movies || []);
+          setWatchlistMovies(document.watchlist || []);
         }
       } catch (error) {
         console.error("Failed to load catalog ids:", error);
@@ -179,11 +182,12 @@ export default function CatalogManager() {
                   <MovieCard
                     key={movie.id}
                     id={movie.id}
-                    image={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                    image={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null}
                     title={movie.title}
                     author={movie.director || "Inconnu"}
                     palette={movie.palette}
                     isInCatalog={catalogTmdbIds.has(movie.id)}
+                    isInWatchlist={watchlistTmdbIds.has(movie.id)}
                     onAddedToCatalog={handleAddedToCatalog}
                   />
                 ))}

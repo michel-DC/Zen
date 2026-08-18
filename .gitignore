@@ -5,3 +5,12 @@ PYTHON.md
 STACK.md
 INFO.md
 /python/.env
+/python/cache/
+__pycache__/
+*.py[cod]
+.wrangler/
+.vercel/
+.impeccable/live/
+verification-*.png
+
+.vercel

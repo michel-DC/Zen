@@ -9,21 +9,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import MoviePoster from "@/components/movie-poster";
 import { getColorName } from "@/lib/color-names";
 import { catalogApi } from "@/lib/services/catalog-api";
 import { Copy } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 
 type MovieCardProps = {
   id: number;
-  image: string;
+  image?: string | null;
   title: string;
   author: string;
   palette?: (string | { hex: string; name: string; percentage: number })[];
   isInCatalog?: boolean;
+  isInWatchlist?: boolean;
   onAddedToCatalog?: (movieId: number) => void;
 };
 
@@ -34,6 +35,7 @@ export function MovieCard({
   author,
   palette = [],
   isInCatalog = false,
+  isInWatchlist = false,
   onAddedToCatalog,
 }: MovieCardProps) {
   const copyToClipboard = (text: string) => {
@@ -74,18 +76,26 @@ export function MovieCard({
     }
   };
 
+  const handleAddToWatchlist = async () => {
+    try {
+      await catalogApi.createWatchlistMovie({ title, release_year: null, director: author || null, overview: null, poster_url: image || null, tmdb_id: id || null, genres: [], watched_at: null, rating: null, favorite: false, notes: null });
+      toast.success("Film ajouté à À voir");
+    } catch (err: any) {
+      toast.error(err?.message || "Impossible d'ajouter ce film à À voir");
+    }
+  };
+
   return (
     <article className="group relative flex flex-col bg-transparent rounded-md">
       <Link
         href={`/movies/${id}`}
         className="relative block aspect-2/3 overflow-hidden rounded-xl shadow-sm transition-all hover:shadow-md group-hover:ring-1 group-hover:ring-foreground/50"
       >
-        <Image
+        <MoviePoster
           src={image}
           alt={title}
-          fill
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-          className="object-cover rounded-xl"
+          className="rounded-xl object-cover"
         />
       </Link>
 
@@ -98,7 +108,7 @@ export function MovieCard({
           </Link>
           <p className="text-xs text-muted-foreground mt-1">Par {author}</p>
           {pathname === "/app" && (
-            <div className="mt-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={handleAddToCatalog}
@@ -109,6 +119,9 @@ export function MovieCard({
                 {isInCatalog
                   ? "Déjà dans le catalogue"
                   : "Ajouter au catalogue"}
+              </button>
+              <button type="button" onClick={handleAddToWatchlist} disabled={isInWatchlist || isInCatalog} className="text-xs px-3 py-1 rounded-full border border-border disabled:cursor-not-allowed disabled:opacity-50">
+                {isInWatchlist ? "Déjà à voir" : "Ajouter à voir"}
               </button>
             </div>
           )}

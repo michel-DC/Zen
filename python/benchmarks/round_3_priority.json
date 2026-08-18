@@ -1,0 +1,24 @@
+[
+  {
+    "case": "youth_18x2_to_last_10_years",
+    "source_tmdb_id": 1188258,
+    "target_tmdb_id": 876797,
+    "rank": null,
+    "candidate_rank": 164,
+    "top_3": [
+      {
+        "tmdb_id": 1627868,
+        "title": "顾禁南囚"
+      },
+      {
+        "tmdb_id": 625119,
+        "title": "竹籬笆外的春天"
+      },
+      {
+        "tmdb_id": 4588,
+        "title": "Lust, Caution"
+      }
+    ],
+    "candidate_count": 175
+  }
+]

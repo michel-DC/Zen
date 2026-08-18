@@ -1,14 +1,17 @@
 "use client";
 
 import { useLoadingLine } from "@/components/layout/loading-line-provider";
+import MoviePoster from "@/components/movie-poster";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { movieApi, type DetailedMovie } from "@/lib/services/movie-api";
+import { catalogApi } from "@/lib/services/catalog-api";
 import { ArrowLeft, Star, User } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function MovieDetailPage() {
   const params = useParams();
@@ -41,6 +44,14 @@ export default function MovieDetailPage() {
   const handleBack = () => {
     router.back();
   };
+  const addTo = async (target: "catalog" | "watchlist") => {
+    if (!movie) return;
+    const payload = { title: movie.title, release_year: movie.release_year, director: movie.director, overview: movie.overview, poster_url: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null, tmdb_id: movie.id, genres: movie.genres, watched_at: null, rating: null, favorite: false, notes: null };
+    try {
+      if (target === "catalog") await catalogApi.createMovie(payload); else await catalogApi.createWatchlistMovie(payload);
+      toast.success(target === "catalog" ? "Film ajouté au catalogue" : "Film ajouté à À voir");
+    } catch (error: any) { toast.error(error?.message || "Impossible d’ajouter ce film"); }
+  };
 
   if (error) {
     return (
@@ -71,11 +82,11 @@ export default function MovieDetailPage() {
             {isLoading ? (
               <Skeleton className="absolute inset-0 bg-foreground/10" />
             ) : (
-              <Image
-                src={`https://image.tmdb.org/t/p/w780${movie?.poster_path}`}
+              <MoviePoster
+                src={movie?.poster_path ? `https://image.tmdb.org/t/p/w780${movie.poster_path}` : null}
                 alt={movie?.title || "Poster"}
-                fill
                 priority
+                sizes="350px"
                 className="object-cover"
               />
             )}
@@ -148,6 +159,7 @@ export default function MovieDetailPage() {
                       </Badge>
                     ))}
                   </div>
+                  <div className="mt-6 flex gap-2"><Button onClick={() => addTo("watchlist")} variant="outline">Ajouter à voir</Button><Button onClick={() => addTo("catalog")}>Ajouter au catalogue</Button></div>
                 </div>
 
                 <div className="mt-10">

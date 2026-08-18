@@ -1,0 +1,174 @@
+[
+  {
+    "case": "chihiro_to_mononoke",
+    "source_tmdb_id": 129,
+    "target_tmdb_id": 128,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 16859,
+        "title": "Kiki la petite sorcière"
+      },
+      {
+        "tmdb_id": 573683,
+        "title": "Wonderland, le royaume sans pluie"
+      },
+      {
+        "tmdb_id": 683127,
+        "title": "Aya et la sorcière"
+      }
+    ],
+    "candidate_count": 40
+  },
+  {
+    "case": "mononoke_to_chihiro",
+    "source_tmdb_id": 128,
+    "target_tmdb_id": 129,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 1007757,
+        "title": "Aventures croisées"
+      },
+      {
+        "tmdb_id": 116711,
+        "title": "Epic : La Bataille du royaume secret"
+      },
+      {
+        "tmdb_id": 588921,
+        "title": "Ainbo, princesse d'Amazonie"
+      }
+    ],
+    "candidate_count": 40
+  },
+  {
+    "case": "tortured_to_boy_mole_fox_horse",
+    "source_tmdb_id": 802699,
+    "target_tmdb_id": 995133,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 989730,
+        "title": "Mononoke, le film : Un fantôme sous la pluie"
+      },
+      {
+        "tmdb_id": 585077,
+        "title": "Les enfants de la mer"
+      },
+      {
+        "tmdb_id": 628964,
+        "title": "L'Enfant du mois de Kamiari"
+      }
+    ],
+    "candidate_count": 39
+  },
+  {
+    "case": "aftersun_to_after_yang",
+    "source_tmdb_id": 965150,
+    "target_tmdb_id": 585378,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 790867,
+        "title": "Eternal Daughter"
+      },
+      {
+        "tmdb_id": 25994,
+        "title": "L'invitée de l'hiver"
+      },
+      {
+        "tmdb_id": 34760,
+        "title": "Goodnight, Mother"
+      }
+    ],
+    "candidate_count": 40
+  },
+  {
+    "case": "hear_me_to_josee",
+    "source_tmdb_id": 1160981,
+    "target_tmdb_id": 602301,
+    "rank": 3,
+    "top_3": [
+      {
+        "tmdb_id": 962489,
+        "title": "Ditto"
+      },
+      {
+        "tmdb_id": 22556,
+        "title": "Le Mouchoir jaune"
+      },
+      {
+        "tmdb_id": 602301,
+        "title": "Josée"
+      }
+    ],
+    "candidate_count": 39
+  },
+  {
+    "case": "your_eyes_tell_to_always",
+    "source_tmdb_id": 730154,
+    "target_tmdb_id": 86000,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 364733,
+        "title": "Amour aveugle"
+      },
+      {
+        "tmdb_id": 1385185,
+        "title": "Światłoczuła"
+      },
+      {
+        "tmdb_id": 1005681,
+        "title": "L'Amour au pied du mur"
+      }
+    ],
+    "candidate_count": 39
+  },
+  {
+    "case": "youth_18x2_to_last_10_years",
+    "source_tmdb_id": 1188258,
+    "target_tmdb_id": 876797,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 442808,
+        "title": "悲しいボーイフレンド"
+      },
+      {
+        "tmdb_id": 809658,
+        "title": "Between Us"
+      },
+      {
+        "tmdb_id": 442258,
+        "title": "飯と乙女"
+      }
+    ],
+    "candidate_count": 40
+  },
+  {
+    "case": "paterson_to_columbus",
+    "error": "Server error '503 Service Unavailable' for url 'http://host.docker.internal:8000/api/v1/catalog/recommendations'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503"
+  },
+  {
+    "case": "lost_in_translation_to_drive_my_car",
+    "source_tmdb_id": 153,
+    "target_tmdb_id": 758866,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 61675,
+        "title": "I Love L.A."
+      },
+      {
+        "tmdb_id": 6964,
+        "title": "Tout peut arriver"
+      },
+      {
+        "tmdb_id": 9621,
+        "title": "Rencontres à Elizabethtown"
+      }
+    ],
+    "candidate_count": 40
+  }
+]

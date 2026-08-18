@@ -114,6 +114,8 @@ class CatalogDocument(BaseModel):
     version: int = 1
     updated_at: datetime
     movies: list[CatalogMovieRecord] = Field(default_factory=list)
+    watchlist: list[CatalogMovieRecord] = Field(default_factory=list)
+    rejected_recommendation_tmdb_ids: list[int] = Field(default_factory=list)
     top_three: list[str | None] = Field(
         default_factory=_empty_top_three,
         min_length=3,

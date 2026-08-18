@@ -1,0 +1,17 @@
+[
+  {"source_tmdb_id": 129, "target_tmdb_id": 128},
+  {"source_tmdb_id": 128, "target_tmdb_id": 129},
+  {"source_tmdb_id": 802699, "target_tmdb_id": 995133},
+  {"source_tmdb_id": 965150, "target_tmdb_id": 585378},
+  {"source_tmdb_id": 1160981, "target_tmdb_id": 602301},
+  {"source_tmdb_id": 730154, "target_tmdb_id": 86000},
+  {"source_tmdb_id": 1188258, "target_tmdb_id": 876797},
+  {"source_tmdb_id": 370755, "target_tmdb_id": 414453},
+  {"source_tmdb_id": 153, "target_tmdb_id": 758866},
+  {"source_tmdb_id": 38, "target_tmdb_id": 152601},
+  {"source_tmdb_id": 492188, "target_tmdb_id": 19913},
+  {"source_tmdb_id": 19913, "target_tmdb_id": 38},
+  {"source_tmdb_id": 1100099, "target_tmdb_id": 523781},
+  {"source_tmdb_id": 533444, "target_tmdb_id": 791177},
+  {"source_tmdb_id": 791177, "target_tmdb_id": 398818}
+]

@@ -1,13 +1,13 @@
 "use client";
 
 import MovieCard from "@/components/movie-card";
+import MoviePoster from "@/components/movie-poster";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { CatalogMovie } from "@/lib/services/catalog-api";
 import { catalogApi } from "@/lib/services/catalog-api";
 import { Medal, Search, Trophy, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import * as React from "react";
 import { toast } from "sonner";
@@ -66,7 +66,7 @@ function TopMovieCard({
         <div className="flex flex-col gap-3">
           <MovieCard
             id={movie.tmdb_id ? Number(movie.tmdb_id) : 0}
-            image={movie.poster_url || "/icons/favicon.png"}
+            image={movie.poster_url}
             title={movie.title}
             author={movie.director || "Inconnu"}
           />
@@ -296,10 +296,9 @@ export default function TopPage() {
                     href={movie.tmdb_id ? `/movies/${movie.tmdb_id}` : "/catalog"}
                     className="relative block aspect-[3/4] overflow-hidden rounded-xl bg-muted"
                   >
-                    <Image
-                      src={movie.poster_url || "/icons/favicon.png"}
+                    <MoviePoster
+                      src={movie.poster_url}
                       alt={movie.title}
-                      fill
                       sizes="72px"
                       className="object-cover"
                     />

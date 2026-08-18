@@ -5,13 +5,22 @@ services:
       - "8000:8000"
     env_file:
       - ./python/.env
+    environment:
+      - RECOMMENDATION_AI_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     dns:
       - 8.8.8.8
+    volumes:
+      - ./python/cache:/app/cache
 
   app:
     build:
       context: ./app
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
     ports:
       - "3000:3000"
     environment:

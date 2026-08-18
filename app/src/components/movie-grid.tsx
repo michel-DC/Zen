@@ -134,7 +134,7 @@ export default function MovieGrid() {
               <MovieCard
                 key={m.id}
                 id={m.id}
-                image={`https://image.tmdb.org/t/p/w500${m.poster_path}`}
+                image={m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null}
                 title={m.title}
                 author={m.director || "Inconnu"}
                 palette={m.palette}

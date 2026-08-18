@@ -1,0 +1,332 @@
+[
+  {
+    "case": "chihiro_to_mononoke",
+    "source_tmdb_id": 129,
+    "target_tmdb_id": 128,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 128,
+        "title": "Princesse Mononoké"
+      },
+      {
+        "tmdb_id": 16859,
+        "title": "Kiki la petite sorcière"
+      },
+      {
+        "tmdb_id": 573683,
+        "title": "Wonderland, le royaume sans pluie"
+      }
+    ],
+    "candidate_count": 64
+  },
+  {
+    "case": "mononoke_to_chihiro",
+    "source_tmdb_id": 128,
+    "target_tmdb_id": 129,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 129,
+        "title": "Le Voyage de Chihiro"
+      },
+      {
+        "tmdb_id": 995133,
+        "title": "L'enfant, la taupe, le renard et le cheval"
+      },
+      {
+        "tmdb_id": 15283,
+        "title": "Pompoko"
+      }
+    ],
+    "candidate_count": 64
+  },
+  {
+    "case": "tortured_to_boy_mole_fox_horse",
+    "source_tmdb_id": 802699,
+    "target_tmdb_id": 995133,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 995133,
+        "title": "L'enfant, la taupe, le renard et le cheval"
+      },
+      {
+        "tmdb_id": 129,
+        "title": "Le Voyage de Chihiro"
+      },
+      {
+        "tmdb_id": 414453,
+        "title": "Columbus"
+      }
+    ],
+    "candidate_count": 64
+  },
+  {
+    "case": "aftersun_to_after_yang",
+    "source_tmdb_id": 965150,
+    "target_tmdb_id": 585378,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 585378,
+        "title": "After Yang"
+      },
+      {
+        "tmdb_id": 758866,
+        "title": "Drive My Car"
+      },
+      {
+        "tmdb_id": 398818,
+        "title": "Call Me by Your Name"
+      }
+    ],
+    "candidate_count": 60
+  },
+  {
+    "case": "hear_me_to_josee",
+    "source_tmdb_id": 1160981,
+    "target_tmdb_id": 602301,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 602301,
+        "title": "Josée"
+      },
+      {
+        "tmdb_id": 962489,
+        "title": "Ditto"
+      },
+      {
+        "tmdb_id": 414453,
+        "title": "Columbus"
+      }
+    ],
+    "candidate_count": 59
+  },
+  {
+    "case": "your_eyes_tell_to_always",
+    "source_tmdb_id": 730154,
+    "target_tmdb_id": 86000,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 86000,
+        "title": "Always"
+      },
+      {
+        "tmdb_id": 398818,
+        "title": "Call Me by Your Name"
+      },
+      {
+        "tmdb_id": 523781,
+        "title": "Des Mots sur les murs"
+      }
+    ],
+    "candidate_count": 59
+  },
+  {
+    "case": "youth_18x2_to_last_10_years",
+    "source_tmdb_id": 1188258,
+    "target_tmdb_id": 876797,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 876797,
+        "title": "The Last 10 Years"
+      },
+      {
+        "tmdb_id": 758866,
+        "title": "Drive My Car"
+      },
+      {
+        "tmdb_id": 523781,
+        "title": "Des Mots sur les murs"
+      }
+    ],
+    "candidate_count": 60
+  },
+  {
+    "case": "paterson_to_columbus",
+    "source_tmdb_id": 370755,
+    "target_tmdb_id": 414453,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 414453,
+        "title": "Columbus"
+      },
+      {
+        "tmdb_id": 602301,
+        "title": "Josée"
+      },
+      {
+        "tmdb_id": 86000,
+        "title": "Always"
+      }
+    ],
+    "candidate_count": 58
+  },
+  {
+    "case": "lost_in_translation_to_drive_my_car",
+    "source_tmdb_id": 153,
+    "target_tmdb_id": 758866,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 758866,
+        "title": "Drive My Car"
+      },
+      {
+        "tmdb_id": 585378,
+        "title": "After Yang"
+      },
+      {
+        "tmdb_id": 6964,
+        "title": "Tout peut arriver"
+      }
+    ],
+    "candidate_count": 58
+  },
+  {
+    "case": "eternal_sunshine_to_her",
+    "source_tmdb_id": 38,
+    "target_tmdb_id": 152601,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 152601,
+        "title": "Her"
+      },
+      {
+        "tmdb_id": 414453,
+        "title": "Columbus"
+      },
+      {
+        "tmdb_id": 602301,
+        "title": "Josée"
+      }
+    ],
+    "candidate_count": 60
+  },
+  {
+    "case": "marriage_story_to_500_days",
+    "source_tmdb_id": 492188,
+    "target_tmdb_id": 19913,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 19913,
+        "title": "(500) jours ensemble"
+      },
+      {
+        "tmdb_id": 791177,
+        "title": "Bones and All"
+      },
+      {
+        "tmdb_id": 371462,
+        "title": "Margaret"
+      }
+    ],
+    "candidate_count": 58
+  },
+  {
+    "case": "500_days_to_eternal_sunshine",
+    "source_tmdb_id": 19913,
+    "target_tmdb_id": 38,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 38,
+        "title": "Eternal Sunshine of the Spotless Mind"
+      },
+      {
+        "tmdb_id": 523781,
+        "title": "Des Mots sur les murs"
+      },
+      {
+        "tmdb_id": 152601,
+        "title": "Her"
+      }
+    ],
+    "candidate_count": 56
+  },
+  {
+    "case": "we_live_in_time_to_words_on_bathroom_walls",
+    "source_tmdb_id": 1100099,
+    "target_tmdb_id": 523781,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 523781,
+        "title": "Des Mots sur les murs"
+      },
+      {
+        "tmdb_id": 38,
+        "title": "Eternal Sunshine of the Spotless Mind"
+      },
+      {
+        "tmdb_id": 86000,
+        "title": "Always"
+      }
+    ],
+    "candidate_count": 59
+  },
+  {
+    "case": "waves_to_bones_and_all",
+    "source_tmdb_id": 533444,
+    "target_tmdb_id": 791177,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 791177,
+        "title": "Bones and All"
+      },
+      {
+        "tmdb_id": 19913,
+        "title": "(500) jours ensemble"
+      },
+      {
+        "tmdb_id": 1365,
+        "title": "À  l'ombre de la haine"
+      }
+    ],
+    "candidate_count": 60
+  },
+  {
+    "case": "bones_and_all_to_call_me_by_your_name",
+    "source_tmdb_id": 791177,
+    "target_tmdb_id": 398818,
+    "rank": 1,
+    "candidate_rank": 1,
+    "top_3": [
+      {
+        "tmdb_id": 398818,
+        "title": "Call Me by Your Name"
+      },
+      {
+        "tmdb_id": 86000,
+        "title": "Always"
+      },
+      {
+        "tmdb_id": 585378,
+        "title": "After Yang"
+      }
+    ],
+    "candidate_count": 59
+  }
+]

@@ -99,8 +99,9 @@ async def get_movies(
         total_pages = response.get("total_pages", 1)
         total_results = response.get("total_results", 0)
 
-        # Filtrage des films sans posters
-        valid_results = [m for m in results if m.get("poster_path")]
+        # Les films sans affiche restent consultables : le frontend affiche un
+        # état explicite à la place d'un visuel de substitution trompeur.
+        valid_results = results
         
         # Enrichissement parallèle
         enriched_movies = await asyncio.gather(

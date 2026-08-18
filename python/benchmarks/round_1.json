@@ -1,0 +1,65 @@
+[
+  {
+    "case": "chihiro_to_mononoke",
+    "source_tmdb_id": 129,
+    "target_tmdb_id": 128,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 16859,
+        "title": "Kiki la petite sorcière"
+      },
+      {
+        "tmdb_id": 573683,
+        "title": "Wonderland, le royaume sans pluie"
+      },
+      {
+        "tmdb_id": 683127,
+        "title": "Aya et la sorcière"
+      }
+    ],
+    "candidate_count": 123
+  },
+  {
+    "case": "mononoke_to_chihiro",
+    "source_tmdb_id": 128,
+    "target_tmdb_id": 129,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 116711,
+        "title": "Epic : La Bataille du royaume secret"
+      },
+      {
+        "tmdb_id": 588921,
+        "title": "Ainbo, princesse d'Amazonie"
+      },
+      {
+        "tmdb_id": 1007757,
+        "title": "Aventures croisées"
+      }
+    ],
+    "candidate_count": 124
+  },
+  {
+    "case": "tortured_to_boy_mole_fox_horse",
+    "source_tmdb_id": 802699,
+    "target_tmdb_id": 995133,
+    "rank": null,
+    "top_3": [
+      {
+        "tmdb_id": 989730,
+        "title": "Mononoke, le film : Un fantôme sous la pluie"
+      },
+      {
+        "tmdb_id": 585077,
+        "title": "Les enfants de la mer"
+      },
+      {
+        "tmdb_id": 628964,
+        "title": "L'Enfant du mois de Kamiari"
+      }
+    ],
+    "candidate_count": 120
+  }
+]

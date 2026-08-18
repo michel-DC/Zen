@@ -171,7 +171,7 @@ export default function CatalogPage() {
                     <div key={movie.id} className="flex flex-col gap-3">
                       <MovieCard
                         id={movie.tmdb_id ? Number(movie.tmdb_id) : 0}
-                        image={movie.poster_url || "/icons/favicon.png"}
+                        image={movie.poster_url}
                         title={movie.title}
                         author={movie.director || "Inconnu"}
                       />
@@ -183,10 +183,13 @@ export default function CatalogPage() {
                           type="button"
                           onClick={() => handleDelete(movie.id)}
                           disabled={deletingId === movie.id}
-                          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-500/25 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/15"
+                          aria-label={`Supprimer ${movie.title} du catalogue`}
+                          title="Supprimer"
+                          className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700 transition-colors hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-500/25 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/15"
                         >
-                          <Trash2 className="size-3.5" />
-                          {deletingId === movie.id ? "Suppression..." : "Supprimer"}
+                          <Trash2
+                            className={`size-3.5 ${deletingId === movie.id ? "animate-pulse" : ""}`}
+                          />
                         </button>
                       </div>
                     </div>

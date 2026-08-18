@@ -21,7 +21,22 @@ export type CatalogDocument = {
   version: number;
   updated_at: string;
   movies: CatalogMovie[];
+  watchlist: CatalogMovie[];
   top_three: Array<string | null>;
+};
+
+export type RecommendationResult = {
+  id: number;
+  title: string;
+  poster_path: string | null;
+  director: string;
+  release_year: number | null;
+};
+
+export type RecommendationResponse = {
+  data: RecommendationResult[];
+  pagination: { offset: number; limit: number; total: number; has_more: boolean };
+  debug: { model: string; source_tmdb_ids: number[]; candidate_count: number; results: unknown[] };
 };
 
 export type CatalogMoviePayload = {
@@ -59,6 +74,35 @@ export const catalogApi = {
       body: JSON.stringify({ movie_ids: movieIds }),
     });
     return parseResponse<CatalogDocument>(response);
+  },
+  async getRecommendations(payload: {
+    movie_ids: string[];
+    include_animation: boolean;
+    include_documentary: boolean;
+    offset: number;
+  }): Promise<RecommendationResponse> {
+    const response = await fetch(`${API_BASE_URL}/catalog/recommendations`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    return parseResponse<RecommendationResponse>(response);
+  },
+  async rejectRecommendation(tmdbId: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/catalog/recommendations/${tmdbId}/reject`, { method: "POST" });
+    if (!response.ok) throw new Error(((await response.json()) as { detail?: string }).detail || "Une erreur est survenue");
+  },
+  async createWatchlistMovie(payload: CatalogMoviePayload): Promise<CatalogMovie> {
+    const response = await fetch(`${API_BASE_URL}/catalog/watchlist`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    return parseResponse<CatalogMovie>(response);
+  },
+  async markWatchlistMovieAsWatched(movieId: string): Promise<CatalogMovie> {
+    const response = await fetch(`${API_BASE_URL}/catalog/watchlist/${movieId}/watched`, { method: "POST" });
+    return parseResponse<CatalogMovie>(response);
+  },
+  async deleteWatchlistMovie(movieId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/catalog/watchlist/${movieId}`, { method: "DELETE" });
+    if (!response.ok) throw new Error(((await response.json()) as { detail?: string }).detail || "Une erreur est survenue");
   },
 
   async createMovie(payload: CatalogMoviePayload): Promise<CatalogMovie> {

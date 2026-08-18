@@ -29,6 +29,13 @@ def on_startup():
     print(f"TMDB_KEY: {'SET' if settings.TMDB_API_KEY else 'MISSING'}")
     print(f"MODE: DIRECT BRIDGE (NO DB)")
     print(f"R2_BUCKET: {settings.CLOUDFLARE_R2_BUCKET_NAME or 'MISSING'}")
+    print(f"RECOMMENDATION_AI_PROVIDER: {settings.RECOMMENDATION_AI_PROVIDER}")
+    if settings.RECOMMENDATION_AI_PROVIDER.casefold() == "cloudflare":
+        cloudflare_ai_ready = bool(
+            settings.CLOUDFLARE_AI_ACCOUNT_ID
+            and settings.CLOUDFLARE_AI_API_TOKEN
+        )
+        print(f"CLOUDFLARE_AI: {'SET' if cloudflare_ai_ready else 'MISSING'}")
     print(f"------------------------------")
 
 

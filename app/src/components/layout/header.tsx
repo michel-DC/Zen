@@ -18,11 +18,13 @@ import {
   Ghost,
   Heart,
   Laugh,
+  Menu,
   Rocket,
   Search,
   Shield,
   Sparkles,
   Sword,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,10 +32,19 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa6";
 
+const navigationItems = [
+  { href: "/app", label: "Recherche" },
+  { href: "/catalog", label: "Catalogue" },
+  { href: "/top", label: "Top" },
+  { href: "/recommendations", label: "Recommandations" },
+  { href: "/watchlist", label: "À voir" },
+];
+
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(
     searchParams.get("search") || "",
   );
@@ -46,7 +57,7 @@ export default function Header() {
     { label: "Science-fiction", icon: Rocket, iconClass: "text-cyan-500" },
     { label: "Fantastique", icon: Sword, iconClass: "text-amber-700" },
     { label: "Romance", icon: Heart, iconClass: "text-pink-500" },
-    { label: "Thriller", icon: Shield, iconClass: "text-blue-500" },
+    { label: "Thriller", icon: Shield, iconClass: "text-foreground" },
     { label: "Mystère", icon: Brain, iconClass: "text-green-500" },
     { label: "Animation", icon: Sparkles, iconClass: "text-fuchsia-500" },
   ];
@@ -66,6 +77,23 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [mobileMenuOpen]);
 
   /**
    * Met à jour l'URL avec les nouveaux paramètres
@@ -137,30 +165,11 @@ export default function Header() {
 
   if (!mounted) return null;
 
-  if (pathname === "/app" || pathname === "/catalog" || pathname === "/top") {
-    return (
-      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-transparent dark:border-border dark:bg-background/60 dark:backdrop-blur-xl">
-        <div className="relative flex h-15 items-center justify-center px-8">
-          <Link href="/app" className="flex items-center gap-2">
-            <Image
-              src="/icons/favicon.png"
-              alt="Zen"
-              width={26}
-              height={26}
-              className="h-8 w-8"
-            />
-            <span className="text-lg font-semibold text-foreground">Zen</span>
-          </Link>
-        </div>
-
-        <HeaderLoadingLine />
-      </header>
-    );
-  }
+  const hideMovieFilters = ["/app", "/catalog", "/top", "/recommendations", "/watchlist"].includes(pathname);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-transparent dark:border-border dark:bg-background/60 dark:backdrop-blur-xl">
-      <div className="flex h-15 items-center gap-4 px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-white dark:border-border dark:bg-black">
+      <div className="flex h-15 items-center gap-2 px-4 lg:gap-4 lg:px-8">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image
             src="/icons/favicon.png"
@@ -172,10 +181,26 @@ export default function Header() {
           <span className="text-lg font-semibold text-foreground">Zen</span>
         </Link>
 
+        <nav aria-label="Navigation principale" className="hidden items-center gap-1 lg:flex">
+          {navigationItems.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={`relative px-2.5 py-2 text-sm transition-colors after:absolute after:inset-x-2.5 after:bottom-0 after:h-px after:origin-center after:bg-foreground after:transition-transform after:duration-200 after:ease-out motion-reduce:after:transition-none ${active ? "text-foreground after:scale-x-100" : "text-muted-foreground after:scale-x-0 hover:text-foreground"}`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
         <div className="flex-1" />
 
-        <div className="flex items-center gap-3 -mr-2">
-          <form onSubmit={handleFormSubmit} className="relative sm:w-57.5">
+        <div className="-mr-2 flex items-center gap-1 sm:gap-2 lg:gap-3">
+          <form onSubmit={handleFormSubmit} className="relative hidden sm:block sm:w-57.5">
             <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
@@ -187,7 +212,7 @@ export default function Header() {
             />
           </form>
 
-          <DropdownMenu>
+          {!hideMovieFilters && <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
@@ -216,9 +241,9 @@ export default function Header() {
                 ))}
               </div>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>}
 
-          <DropdownMenu>
+          {!hideMovieFilters && <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
@@ -251,23 +276,66 @@ export default function Header() {
                 );
               })}
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu>}
 
           <div className="origin-center scale-90">
             <ModeToggle />
           </div>
 
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="inline-flex size-11 items-center justify-center rounded-lg text-foreground transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring motion-reduce:transition-none lg:hidden"
+          >
+            {mobileMenuOpen ? (
+              <X className="size-5" aria-hidden="true" />
+            ) : (
+              <Menu className="size-5" aria-hidden="true" />
+            )}
+          </button>
+
           <Link
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden h-9 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:flex"
+            className="hidden h-9 items-center justify-center whitespace-nowrap rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground xl:flex"
           >
             <FaGithub className="h-4 w-4" />
             <span className="sr-only">GitHub</span>
           </Link>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <div
+          id="mobile-navigation"
+          className="absolute inset-x-0 top-full border-b border-black/10 bg-white px-4 py-2 dark:border-border dark:bg-black lg:hidden"
+        >
+          <nav aria-label="Navigation mobile" className="flex flex-col">
+            {navigationItems.map((item) => {
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex min-h-11 items-center text-base transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-ring motion-reduce:transition-none ${active ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  <span
+                    className={`relative py-2 after:absolute after:inset-x-0 after:bottom-1 after:h-px after:bg-foreground ${active ? "after:scale-x-100" : "after:scale-x-0"}`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
 
       <HeaderLoadingLine />
     </header>
