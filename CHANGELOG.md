@@ -1,3 +1,7 @@
+## 21-08-2026
+
+- 10:00 Correction du transfert d’un film de la liste « À voir » vers le catalogue : sa date d’ajout est désormais la date réelle du passage au catalogue, et non son ancienne date d’ajout à la watchlist.
+
 ## 13-06-2026
 
 - 10:17 Ajout du fichier `python/.python-version` pour forcer Python 3.12 sur Render et éviter l'échec de build de `Pillow` avec la version par défaut Python 3.14.

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from threading import Lock
 from uuid import uuid4
 
@@ -128,8 +128,13 @@ class R2CatalogStore:
                 (item for item in document.movies if item.tmdb_id and item.tmdb_id == movie.tmdb_id), None
             )
             if existing is None:
-                movie.watched_at = date.today()
-                movie.updated_at = _now()
+                # A film leaves the watchlist only once it is watched.  Its catalog
+                # entry must therefore be dated from that transition, rather than
+                # from the earlier moment it was saved to the watchlist.
+                now = _now()
+                movie.created_at = now
+                movie.watched_at = now.date()
+                movie.updated_at = now
                 document.movies.insert(0, movie)
                 result = movie
             else:
