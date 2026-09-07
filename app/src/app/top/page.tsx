@@ -3,11 +3,13 @@
 import MovieCard from "@/components/movie-card";
 import MoviePoster from "@/components/movie-poster";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchField } from "@/components/ui/search-field";
+import { PageHeading } from "@/components/layout/page-heading";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { CatalogMovie } from "@/lib/services/catalog-api";
 import { catalogApi } from "@/lib/services/catalog-api";
-import { Medal, Search, Trophy, X } from "lucide-react";
+import { Medal, Trophy, X } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { toast } from "sonner";
@@ -79,7 +81,7 @@ function TopMovieCard({
               variant="outline"
               size="sm"
               onClick={onRemove}
-              className="rounded-full"
+              
             >
               <X className="size-3.5" />
               Retirer
@@ -87,7 +89,7 @@ function TopMovieCard({
           </div>
         </div>
       ) : (
-        <div className="flex aspect-[4/5] items-center justify-center rounded-3xl border border-dashed border-black/15 bg-black/[0.02] p-6 text-center dark:border-white/10 dark:bg-white/[0.03]">
+        <div className="flex aspect-[4/5] items-center justify-center rounded-xl border border-dashed border-black/15 bg-black/[0.02] p-6 text-center dark:bg-white/[0.03]">
           <div className="space-y-2">
             <p className="text-base font-medium">Aucun film sélectionné</p>
             <p className="text-sm text-muted-foreground">
@@ -188,13 +190,13 @@ export default function TopPage() {
 
   if (isLoading && catalogMovies.length === 0) {
     return (
-      <main className="px-6 py-8">
-        <section className="mx-auto max-w-full px-4 space-y-8">
+      <main id="main-content" className="w-full px-10 py-8">
+        <section className="space-y-8">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="space-y-3">
                 <Skeleton className="h-7 w-20 rounded-full" />
-                <Skeleton className="aspect-[4/5] w-full rounded-3xl" />
+                <Skeleton className="aspect-[4/5] w-full rounded-xl" />
               </div>
             ))}
           </div>
@@ -205,7 +207,7 @@ export default function TopPage() {
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-[72px_1fr] gap-3 rounded-2xl border border-black/10 p-3 dark:border-white/10"
+                  className="grid grid-cols-[72px_1fr] gap-3 rounded-lg border border-border p-3"
                 >
                   <Skeleton className="aspect-[3/4] w-full rounded-xl" />
                   <div className="space-y-2">
@@ -230,14 +232,9 @@ export default function TopPage() {
   }
 
   return (
-    <main className="px-6 py-8">
-      <section className="mx-auto max-w-full px-4 space-y-10">
-        <div className="space-y-3">
-          <h1 className="text-2xl font-semibold tracking-tight">Mon top 3</h1>
-          <p className="text-sm text-muted-foreground">
-            Choisis les trois meilleurs films vus dans ton catalogue.
-          </p>
-        </div>
+    <main id="main-content" className="w-full px-10 py-8">
+      <section className="space-y-10">
+        <PageHeading title="Mon top 3" description="Les trois films qui méritent une place à part dans ta collection." />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {topMovies.map((movie, index) => (
@@ -250,7 +247,7 @@ export default function TopPage() {
           ))}
         </div>
 
-        <div className="space-y-5 border-t border-black/10 pt-8 dark:border-white/10">
+        <div className="space-y-5 border-t border-border pt-8">
           <div className="space-y-2">
             <h2 className="text-lg font-semibold tracking-tight">
               Choisir ou modifier mon top
@@ -260,16 +257,7 @@ export default function TopPage() {
             </p>
           </div>
 
-          <div className="relative max-w-md">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="text"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Rechercher dans les films vus"
-              className="pl-9"
-            />
-          </div>
+          <SearchField id="top-search" label="Rechercher dans les films vus" value={query} onChange={setQuery} />
 
           {catalogMovies.length === 0 ? (
             <div className="py-12 text-center">
@@ -290,7 +278,7 @@ export default function TopPage() {
               {filteredCatalogMovies.map((movie) => (
                 <article
                   key={movie.id}
-                  className="grid grid-cols-[72px_1fr] gap-3 rounded-2xl border border-black/10 p-3 dark:border-white/10"
+                  className="grid grid-cols-[72px_1fr] gap-3 rounded-lg border border-border p-3"
                 >
                   <Link
                     href={movie.tmdb_id ? `/movies/${movie.tmdb_id}` : "/catalog"}
@@ -314,7 +302,7 @@ export default function TopPage() {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <ButtonGroup aria-label="Attribuer une place dans le top">
                       {rankStyles.map((rank, rankIndex) => (
                         <Button
                           key={rank.label}
@@ -323,13 +311,13 @@ export default function TopPage() {
                           variant={
                             topIds[rankIndex] === movie.id ? "default" : "outline"
                           }
-                          className="rounded-full"
+                          
                           onClick={() => assignMovieToRank(movie.id, rankIndex)}
                         >
                           {rank.label}
                         </Button>
                       ))}
-                    </div>
+                    </ButtonGroup>
                   </div>
                 </article>
               ))}

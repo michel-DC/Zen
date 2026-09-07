@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Zen",
     short_name: "Zen",
     description: "Catalogue et recherche de films Zen.",
-    start_url: "/app",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#ffffff",

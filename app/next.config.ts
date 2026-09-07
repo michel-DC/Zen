@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  devIndicators: false,
+  async redirects() { return [{ source: "/app", destination: "/", permanent: true }]; },
   images: {
     remotePatterns: [
       {

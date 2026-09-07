@@ -1,11 +1,16 @@
 "use client";
 
 import MovieCard from "@/components/movie-card";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { SearchField } from "@/components/ui/search-field";
+import { PageHeading } from "@/components/layout/page-heading";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { CatalogMovie } from "@/lib/services/catalog-api";
 import { catalogApi } from "@/lib/services/catalog-api";
-import { Search, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -49,6 +54,7 @@ export default function CatalogPage() {
   const [isLoading, setIsLoading] = React.useState(true);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
+  const [order, setOrder] = React.useState("recent");
 
   React.useEffect(() => {
     let mounted = true;
@@ -85,8 +91,8 @@ export default function CatalogPage() {
   }, [movies, query]);
 
   const groupedMovies = React.useMemo(
-    () => groupMoviesByAddedDate(filteredMovies),
-    [filteredMovies],
+    () => groupMoviesByAddedDate([...filteredMovies].sort((a, b) => order === "oldest" ? Date.parse(a.created_at) - Date.parse(b.created_at) : Date.parse(b.created_at) - Date.parse(a.created_at))),
+    [filteredMovies, order],
   );
 
   const handleDelete = async (movieId: string) => {
@@ -106,8 +112,8 @@ export default function CatalogPage() {
 
   if (isLoading && movies.length === 0) {
     return (
-      <main className="px-6 py-8">
-        <section className="mx-auto max-w-full px-4">
+      <main id="main-content" className="w-full px-10 py-8">
+        <section className="space-y-8">
           <div className="space-y-8">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="space-y-4">
@@ -129,24 +135,15 @@ export default function CatalogPage() {
   }
 
   return (
-    <main className="px-6 py-8">
-      <section className="mx-auto max-w-full px-4 space-y-8">
-        <div className="relative max-w-md">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Rechercher dans le catalogue"
-            className="pl-9"
-          />
-        </div>
-
+    <main id="main-content" className="w-full px-10 py-8">
+      <section className="space-y-8">
+        <PageHeading title="Catalogue" description="Les films que tu as vus, réunis au même endroit."><Button asChild><Link href="/">Ajouter un film</Link></Button></PageHeading>
+        <div className="flex flex-wrap items-end justify-between gap-4"><SearchField id="catalog-search" label="Rechercher dans le catalogue" value={query} onChange={setQuery} /><div className="space-y-2"><Label htmlFor="catalog-order">Ordre d’ajout</Label><Select value={order} onValueChange={setOrder}><SelectTrigger id="catalog-order" className="h-9 w-44"><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="recent">Plus récents</SelectItem><SelectItem value="oldest">Plus anciens</SelectItem></SelectContent></Select></div></div>
         {movies.length === 0 ? (
           <div className="py-16 text-center">
             <h2 className="text-xl font-semibold">Catalogue vide</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Ajoute d&apos;abord des films depuis la page /app.
+              Trouve un film depuis la recherche pour commencer ta collection.
             </p>
           </div>
         ) : groupedMovies.length === 0 ? (
@@ -160,7 +157,7 @@ export default function CatalogPage() {
           <div className="space-y-8">
             {groupedMovies.map((group) => (
               <section key={group.key} className="space-y-4">
-                <div className="border-b border-black/10 pb-2 dark:border-white/10">
+                <div className="border-b border-border pb-2">
                   <h2 className="text-lg font-semibold tracking-tight">
                     {group.label}
                   </h2>
@@ -179,18 +176,18 @@ export default function CatalogPage() {
                         <span className="text-xs text-muted-foreground">
                           {movie.release_year || "Année inconnue"}
                         </span>
-                        <button
+                        <Button
                           type="button"
                           onClick={() => handleDelete(movie.id)}
                           disabled={deletingId === movie.id}
                           aria-label={`Supprimer ${movie.title} du catalogue`}
                           title="Supprimer"
-                          className="inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700 transition-colors hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-500/25 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/15"
+                          variant="destructive" size="icon"
                         >
                           <Trash2
                             className={`size-3.5 ${deletingId === movie.id ? "animate-pulse" : ""}`}
                           />
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))}

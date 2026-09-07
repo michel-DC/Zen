@@ -65,12 +65,12 @@ export default function MovieDetailPage() {
   }
 
   return (
-    <main className="min-h-screen pb-20">
-      <div className="max-w-7/8 mx-auto px-8 pt-8">
+    <main id="main-content" className="w-full px-10 py-8 min-h-screen pb-20">
+      <div className="mx-auto">
         <Button
           variant="ghost"
           onClick={handleBack}
-          className="mb-8 hover:bg-transparent p-0 text-muted-foreground hover:text-foreground transition-colors"
+          className="mb-8"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Retour à la liste
@@ -126,7 +126,7 @@ export default function MovieDetailPage() {
             ) : (
               <>
                 <div className="flex flex-col gap-2">
-                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+                  <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
                     {movie?.title}
                     {movie?.release_year && (
                       <span className="ml-3 font-light text-muted-foreground">

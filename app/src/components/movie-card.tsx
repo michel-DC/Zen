@@ -107,7 +107,7 @@ export function MovieCard({
             </h3>
           </Link>
           <p className="text-xs text-muted-foreground mt-1">Par {author}</p>
-          {pathname === "/app" && (
+          {(pathname === "/" || pathname === "/app") && (
             <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
