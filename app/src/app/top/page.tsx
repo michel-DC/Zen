@@ -190,7 +190,7 @@ export default function TopPage() {
 
   if (isLoading && catalogMovies.length === 0) {
     return (
-      <main id="main-content" className="w-full px-10 py-8">
+      <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
         <section className="space-y-8">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
@@ -232,9 +232,9 @@ export default function TopPage() {
   }
 
   return (
-    <main id="main-content" className="w-full px-10 py-8">
+    <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
       <section className="space-y-10">
-        <PageHeading title="Mon top 3" description="Les trois films qui méritent une place à part dans ta collection." />
+        <PageHeading title="Mon top 3" />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {topMovies.map((movie, index) => (
@@ -252,12 +252,9 @@ export default function TopPage() {
             <h2 className="text-lg font-semibold tracking-tight">
               Choisir ou modifier mon top
             </h2>
-            <p className="text-sm text-muted-foreground">
-              Recherche un film déjà présent dans ton catalogue, puis assigne-le à une place du top 3.
-            </p>
           </div>
 
-          <SearchField id="top-search" label="Rechercher dans les films vus" value={query} onChange={setQuery} />
+          <SearchField id="top-search" label="Rechercher dans les films vus" value={query} onChange={setQuery} compact />
 
           {catalogMovies.length === 0 ? (
             <div className="py-12 text-center">

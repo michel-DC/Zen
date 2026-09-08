@@ -1,3 +1,10 @@
+## 08-09-2026
+
+- 20:26 Harmonisation des champs de recherche de l’accueil, de la liste « À voir », du Top 3 et des recommandations avec le même `ButtonGroup` shadcn/ui de 36 px utilisé dans le catalogue.
+- 20:20 Alignement exact des segments du `ButtonGroup` du catalogue sur une hauteur commune de 36 px et restauration du style d’origine en gras des dates de visionnage.
+- 20:16 Remplacement de la double boîte de filtres du catalogue par un véritable `ButtonGroup` shadcn/ui réunissant l’icône, la recherche et le tri dans un seul contrôle continu et sans débordement.
+- 20:09 Refonte visuelle de l’application dans un style shadcn/ui sobre et pleine largeur, avec accueil réduit au header et à la seule barre de recherche, composants de formulaire harmonisés, hiérarchie des pages allégée et conservation intacte des cartes et affiches de films.
+
 ## 21-08-2026
 
 - 10:00 Correction du transfert d’un film de la liste « À voir » vers le catalogue : sa date d’ajout est désormais la date réelle du passage au catalogue, et non son ancienne date d’ajout à la watchlist.

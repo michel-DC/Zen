@@ -2,7 +2,8 @@
 
 import MovieCard from "@/components/movie-card";
 import { Button } from "@/components/ui/button";
-import { SearchField } from "@/components/ui/search-field";
+import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
+import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/layout/page-heading";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -10,7 +11,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { CatalogMovie } from "@/lib/services/catalog-api";
 import { catalogApi } from "@/lib/services/catalog-api";
-import { Trash2 } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -112,7 +113,7 @@ export default function CatalogPage() {
 
   if (isLoading && movies.length === 0) {
     return (
-      <main id="main-content" className="w-full px-10 py-8">
+      <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
         <section className="space-y-8">
           <div className="space-y-8">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -135,10 +136,16 @@ export default function CatalogPage() {
   }
 
   return (
-    <main id="main-content" className="w-full px-10 py-8">
-      <section className="space-y-8">
-        <PageHeading title="Catalogue" description="Les films que tu as vus, réunis au même endroit."><Button asChild><Link href="/">Ajouter un film</Link></Button></PageHeading>
-        <div className="flex flex-wrap items-end justify-between gap-4"><SearchField id="catalog-search" label="Rechercher dans le catalogue" value={query} onChange={setQuery} /><div className="space-y-2"><Label htmlFor="catalog-order">Ordre d’ajout</Label><Select value={order} onValueChange={setOrder}><SelectTrigger id="catalog-order" className="h-9 w-44"><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="recent">Plus récents</SelectItem><SelectItem value="oldest">Plus anciens</SelectItem></SelectContent></Select></div></div>
+    <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
+      <section className="space-y-6">
+        <PageHeading title="Catalogue" description={`${movies.length} film${movies.length > 1 ? "s" : ""}`}><Button asChild><Link href="/">Ajouter</Link></Button></PageHeading>
+        <Label htmlFor="catalog-search" className="sr-only">Rechercher dans le catalogue</Label>
+        <Label htmlFor="catalog-order" className="sr-only">Ordre d’ajout</Label>
+        <ButtonGroup className="w-full">
+          <ButtonGroupText aria-hidden="true" className="bg-background px-3"><Search /></ButtonGroupText>
+          <Input id="catalog-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Titre ou réalisateur…" className="min-w-0 flex-1" style={{ width: 0 }} />
+          <Select value={order} onValueChange={setOrder}><SelectTrigger id="catalog-order" className="h-9! w-40 shrink-0"><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="recent">Plus récents</SelectItem><SelectItem value="oldest">Plus anciens</SelectItem></SelectContent></Select>
+        </ButtonGroup>
         {movies.length === 0 ? (
           <div className="py-16 text-center">
             <h2 className="text-xl font-semibold">Catalogue vide</h2>
