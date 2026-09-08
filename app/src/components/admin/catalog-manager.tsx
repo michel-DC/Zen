@@ -2,12 +2,12 @@
 
 import MovieCard from "@/components/movie-card";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { catalogApi, type CatalogMovie } from "@/lib/services/catalog-api";
 import { movieApi, type Movie } from "@/lib/services/movie-api";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -95,16 +95,15 @@ export default function CatalogManager() {
     return () => { active = false; };
   }, [submittedQuery, retry]);
 
-  return <main id="main-content" className="w-full px-4 pb-12 sm:px-6 lg:px-8">
+  return <main id="main-content" className={submittedQuery ? "w-full px-4 pb-12 sm:px-6 lg:px-8" : "w-full px-4 sm:px-6 lg:px-8"}>
     <section className="space-y-10">
-      <div className={submittedQuery ? "border-b py-8" : "flex min-h-[calc(100svh-3.5rem)] items-center justify-center py-12"}>
+      <div className={submittedQuery ? "border-b py-6 sm:py-8" : "flex min-h-[calc(100svh-3.5rem)] items-center justify-center py-12"}>
         <div className={submittedQuery ? "w-full" : "w-full max-w-3xl"}>
-          <form role="search" onSubmit={(event) => { event.preventDefault(); const value = query.trim(); if (value === submittedQuery) setRetry((n) => n + 1); else router.push(value ? '/?search=' + encodeURIComponent(value) : '/', { scroll: false }); }} className={submittedQuery ? "w-full" : "mx-auto w-full max-w-2xl"}>
+          <form role="search" onSubmit={(event) => { event.preventDefault(); const value = query.trim(); if (value === submittedQuery) setRetry((n) => n + 1); else router.push(value ? '/?search=' + encodeURIComponent(value) : '/', { scroll: false }); }} className={submittedQuery ? "w-full" : "mx-auto w-full max-w-xs sm:max-w-2xl"}>
             <label htmlFor="movie-search" className="sr-only">Rechercher un film</label>
-            <ButtonGroup className="w-full">
-              <ButtonGroupText aria-hidden="true" className="bg-background px-3"><Search /></ButtonGroupText>
-              <Input id="movie-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un film…" autoComplete="off" className="min-w-0 flex-1" style={{ width: 0 }} />
-              <Button type="submit" disabled={!normalizedQuery || isLoading} className="h-9!">{isLoading ? "Recherche…" : "Rechercher"}<ArrowRight data-icon="inline-end" /></Button>
+            <ButtonGroup className="w-full shadow-xs">
+              <Input id="movie-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un film…" autoComplete="off" enterKeyHint="search" className="h-14! min-w-0 flex-1 px-5 text-base sm:h-10! sm:text-sm" style={{ width: 0 }} />
+              <Button type="submit" disabled={!normalizedQuery || isLoading} aria-label={isLoading ? "Recherche en cours" : "Rechercher"} className="h-14! w-14! px-0 sm:h-10! sm:w-auto! sm:px-4"><span className="hidden sm:inline">{isLoading ? "Recherche…" : "Rechercher"}</span><ArrowRight aria-hidden="true" /></Button>
             </ButtonGroup>
           </form>
         </div>

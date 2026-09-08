@@ -9,7 +9,7 @@ export function ModeToggle() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return <DropdownMenu>
-    <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" aria-label="Changer le thème"><Sun className="dark:hidden" /><Moon className="hidden dark:block" /></Button></DropdownMenuTrigger>
+    <DropdownMenuTrigger asChild><Button variant="ghost" size="icon-sm" className="size-11 md:size-8" aria-label="Changer le thème"><Sun className="dark:hidden" /><Moon className="hidden dark:block" /></Button></DropdownMenuTrigger>
     <DropdownMenuContent align="end" className="w-44"><DropdownMenuLabel>Apparence</DropdownMenuLabel><DropdownMenuSeparator />
       <DropdownMenuRadioGroup value={mounted ? theme : "system"} onValueChange={setTheme}>
         <DropdownMenuRadioItem value="light"><Sun />Clair</DropdownMenuRadioItem><DropdownMenuRadioItem value="dark"><Moon />Sombre</DropdownMenuRadioItem><DropdownMenuRadioItem value="system"><Monitor />Système</DropdownMenuRadioItem>

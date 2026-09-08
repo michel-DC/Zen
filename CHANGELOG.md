@@ -1,5 +1,6 @@
 ## 08-09-2026
 
+- 20:38 Refonte mobile de l’accueil avec suppression de l’icône de recherche, barre portée à 56 px et centrée exactement dans l’espace disponible, bouton d’action compact et zones tactiles du header agrandies à 44 px.
 - 20:26 Harmonisation des champs de recherche de l’accueil, de la liste « À voir », du Top 3 et des recommandations avec le même `ButtonGroup` shadcn/ui de 36 px utilisé dans le catalogue.
 - 20:20 Alignement exact des segments du `ButtonGroup` du catalogue sur une hauteur commune de 36 px et restauration du style d’origine en gras des dates de visionnage.
 - 20:16 Remplacement de la double boîte de filtres du catalogue par un véritable `ButtonGroup` shadcn/ui réunissant l’icône, la recherche et le tri dans un seul contrôle continu et sans débordement.
