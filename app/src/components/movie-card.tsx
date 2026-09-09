@@ -11,10 +11,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import MoviePoster from "@/components/movie-poster";
 import { getColorName } from "@/lib/color-names";
+import { extractImagePalette, type ImagePaletteColor } from "@/lib/image-palette";
 import { catalogApi } from "@/lib/services/catalog-api";
 import { Copy } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import * as React from "react";
 import { toast } from "sonner";
 
 type MovieCardProps = {
@@ -38,6 +40,22 @@ export function MovieCard({
   isInWatchlist = false,
   onAddedToCatalog,
 }: MovieCardProps) {
+  const [imagePalette, setImagePalette] = React.useState<ImagePaletteColor[]>([]);
+
+  React.useEffect(() => {
+    if (!image || palette.length) {
+      setImagePalette([]);
+      return;
+    }
+    let active = true;
+    void extractImagePalette(image, 3).then((colors) => {
+      if (active) setImagePalette(colors);
+    });
+    return () => {
+      active = false;
+    };
+  }, [image, palette.length]);
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success(`Copié : ${text}`, {
@@ -45,7 +63,7 @@ export function MovieCard({
     });
   };
 
-  const normalizedPalette = palette.map((col) =>
+  const normalizedPalette = (palette.length ? palette : imagePalette).map((col) =>
     typeof col === "string"
       ? { hex: col, name: getColorName(col), percentage: 0 }
       : col,

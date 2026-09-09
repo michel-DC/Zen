@@ -1,3 +1,10 @@
+## 09-09-2026
+
+- 19:43 Migration du backend de production de Render vers Cloudflare Workers avec conservation des routes `/api/v1`, connexion native au catalogue R2 existant et suppression du délai de réveil du serveur.
+- 19:43 Adaptation du moteur de recommandations aux quotas gratuits de Workers grâce à un vivier TMDB borné, des appels concurrents limités, un cache R2 et des embeddings Workers AI natifs.
+- 19:43 Remplacement de l'extraction Pillow/ColorThief par un échantillonnage local des pixels des affiches optimisées dans le navigateur, sans coût CPU pour le Worker.
+- 19:43 Mise à jour de l'URL backend de secours du frontend et de la documentation de déploiement pour pointer vers `zen-api.djoumessi-michel08.workers.dev`.
+
 ## 08-09-2026
 
 - 20:38 Refonte mobile de l’accueil avec suppression de l’icône de recherche, barre portée à 56 px et centrée exactement dans l’espace disponible, bouton d’action compact et zones tactiles du header agrandies à 44 px.

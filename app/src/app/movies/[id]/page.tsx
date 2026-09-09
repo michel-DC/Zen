@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { movieApi, type DetailedMovie } from "@/lib/services/movie-api";
 import { catalogApi } from "@/lib/services/catalog-api";
+import { extractImagePalette } from "@/lib/image-palette";
 import { ArrowLeft, Star, User } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -29,7 +30,11 @@ export default function MovieDetailPage() {
       try {
         setIsLoading(true);
         const data = await movieApi.getMovieDetail(Number(params.id));
-        setMovie(data);
+        const posterUrl = data.poster_path
+          ? `https://image.tmdb.org/t/p/w500${data.poster_path}`
+          : null;
+        const palette = posterUrl ? await extractImagePalette(posterUrl) : [];
+        setMovie({ ...data, palette: palette.length ? palette : data.palette });
       } catch (err) {
         console.error(err);
         setError("Impossible de charger les détails du film.");

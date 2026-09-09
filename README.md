@@ -5,10 +5,11 @@ Zen est un catalogue personnel de films avec liste « À voir », top 3 et recom
 ## Architecture
 
 - `app/` : frontend Next.js déployé sur Vercel.
-- `python/` : API FastAPI déployée sur Render.
+- `worker/` : API TypeScript déployée sur Cloudflare Workers.
+- `python/` : implémentation FastAPI conservée pour le développement local et comme solution de repli.
 - Cloudflare R2 : persistance du catalogue et de la liste « À voir ».
 - TMDB : recherche, métadonnées et génération ciblée de candidats.
-- Ollama en local / Cloudflare Workers AI en production : profils sémantiques, embeddings et reclassement des recommandations.
+- Ollama en local / Cloudflare Workers AI en production : embeddings et classement des recommandations.
 
 ## Développement local
 

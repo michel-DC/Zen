@@ -1,0 +1,26 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zen-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-09",
+  "observability": {
+    "enabled": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "CATALOG",
+      "bucket_name": "catalogue-zen"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://zen-movies.vercel.app,http://localhost:3000",
+    "CATALOG_KEY": "catalog.json",
+    "TMDB_BASE_URL": "https://api.themoviedb.org/3",
+    "TMDB_IMAGE_BASE_URL": "https://image.tmdb.org/t/p",
+    "AI_EMBEDDING_MODEL": "@cf/qwen/qwen3-embedding-0.6b",
+    "AI_GENERATION_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast"
+  }
+}
