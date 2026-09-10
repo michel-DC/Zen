@@ -1,5 +1,6 @@
 ## 10-09-2026
 
+- 17:10 Regroupement de la recherche avec les quatre entrées de navigation mobile dans une barre unique, avec une sélection plus large, plus neutre et moins saturée.
 - 17:00 Correction du chargement des films avec délai réseau borné, mutualisation des requêtes catalogue, repli IndexedDB hors ligne et états d’erreur réessayables sur l’accueil et la bibliothèque.
 - 17:00 Correction du service worker PWA afin qu’une navigation indisponible ne renvoie plus silencieusement l’accueil à la place d’une fiche film, avec renouvellement du cache en version 3.
 - 08:05 Refonte mobile-first de Zen selon la maquette validée : accueil épuré, navigation inférieure flottante, recherche dédiée, bibliothèque segmentée, fiche film tactile et adaptation sobre de la découverte.
