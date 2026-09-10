@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "@/lib/services/api-base-url";
+import { fetchApi } from "@/lib/services/api-fetch";
 
 export interface Movie {
   id: number;
@@ -52,7 +53,7 @@ export const movieApi = {
     if (filter) url.searchParams.append("filter", filter);
     if (genre) url.searchParams.append("genre", genre);
 
-    const response = await fetch(url.toString());
+    const response = await fetchApi(url);
     if (!response.ok) throw new Error("Failed to fetch movies");
     return response.json();
   },
@@ -61,7 +62,7 @@ export const movieApi = {
    * Récupère le détail d'un film
    */
   async getMovieDetail(id: number): Promise<DetailedMovie> {
-    const response = await fetch(`${API_BASE_URL}/movies/${id}`);
+    const response = await fetchApi(`${API_BASE_URL}/movies/${id}`);
     if (!response.ok) throw new Error("Failed to fetch movie details");
     return response.json();
   },
@@ -70,7 +71,7 @@ export const movieApi = {
    * Lance la synchronisation TMDB
    */
   async syncMovies(pages = 1): Promise<{ message: string }> {
-    const response = await fetch(`${API_BASE_URL}/movies/sync?pages=${pages}`, {
+    const response = await fetchApi(`${API_BASE_URL}/movies/sync?pages=${pages}`, {
       method: "POST",
     });
     if (!response.ok) throw new Error("Sync failed");

@@ -1,4 +1,6 @@
 import { API_BASE_URL } from "@/lib/services/api-base-url";
+import { fetchApi } from "@/lib/services/api-fetch";
+import { readCatalogSnapshot, saveCatalogSnapshot } from "@/lib/offline-catalog";
 
 export type CatalogMovie = {
   id: string;
@@ -61,14 +63,35 @@ async function parseResponse<T>(response: Response): Promise<T> {
   return payload;
 }
 
+let catalogInMemory: CatalogDocument | null = null;
+let catalogRequest: Promise<CatalogDocument> | null = null;
+
+async function loadCatalog(): Promise<CatalogDocument> {
+  try {
+    const response = await fetchApi(`${API_BASE_URL}/catalog`, { cache: "no-store" });
+    const document = await parseResponse<CatalogDocument>(response);
+    catalogInMemory = document;
+    void saveCatalogSnapshot(document).catch(() => undefined);
+    return document;
+  } catch (error) {
+    if (catalogInMemory) return catalogInMemory;
+    const snapshot = await readCatalogSnapshot().catch(() => null);
+    if (snapshot) {
+      catalogInMemory = snapshot;
+      return snapshot;
+    }
+    throw error;
+  }
+}
+
 export const catalogApi = {
   async getCatalog(): Promise<CatalogDocument> {
-    const response = await fetch(`${API_BASE_URL}/catalog`);
-    return parseResponse<CatalogDocument>(response);
+    if (!catalogRequest) catalogRequest = loadCatalog().finally(() => { catalogRequest = null; });
+    return catalogRequest;
   },
 
   async updateTopThree(movieIds: Array<string | null>): Promise<CatalogDocument> {
-    const response = await fetch(`${API_BASE_URL}/catalog/top`, {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/top`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ movie_ids: movieIds }),
@@ -81,32 +104,32 @@ export const catalogApi = {
     include_documentary: boolean;
     offset: number;
   }): Promise<RecommendationResponse> {
-    const response = await fetch(`${API_BASE_URL}/catalog/recommendations`, {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/recommendations`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
     });
     return parseResponse<RecommendationResponse>(response);
   },
   async rejectRecommendation(tmdbId: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/catalog/recommendations/${tmdbId}/reject`, { method: "POST" });
+    const response = await fetchApi(`${API_BASE_URL}/catalog/recommendations/${tmdbId}/reject`, { method: "POST" });
     if (!response.ok) throw new Error(((await response.json()) as { detail?: string }).detail || "Une erreur est survenue");
   },
   async createWatchlistMovie(payload: CatalogMoviePayload): Promise<CatalogMovie> {
-    const response = await fetch(`${API_BASE_URL}/catalog/watchlist`, {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/watchlist`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
     });
     return parseResponse<CatalogMovie>(response);
   },
   async markWatchlistMovieAsWatched(movieId: string): Promise<CatalogMovie> {
-    const response = await fetch(`${API_BASE_URL}/catalog/watchlist/${movieId}/watched`, { method: "POST" });
+    const response = await fetchApi(`${API_BASE_URL}/catalog/watchlist/${movieId}/watched`, { method: "POST" });
     return parseResponse<CatalogMovie>(response);
   },
   async deleteWatchlistMovie(movieId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/catalog/watchlist/${movieId}`, { method: "DELETE" });
+    const response = await fetchApi(`${API_BASE_URL}/catalog/watchlist/${movieId}`, { method: "DELETE" });
     if (!response.ok) throw new Error(((await response.json()) as { detail?: string }).detail || "Une erreur est survenue");
   },
 
   async createMovie(payload: CatalogMoviePayload): Promise<CatalogMovie> {
-    const response = await fetch(`${API_BASE_URL}/catalog`, {
+    const response = await fetchApi(`${API_BASE_URL}/catalog`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -117,7 +140,7 @@ export const catalogApi = {
     movieId: string,
     payload: Partial<CatalogMoviePayload>,
   ): Promise<CatalogMovie> {
-    const response = await fetch(`${API_BASE_URL}/catalog/${movieId}`, {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/${movieId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -125,7 +148,7 @@ export const catalogApi = {
     return parseResponse<CatalogMovie>(response);
   },
   async deleteMovie(movieId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/catalog/${movieId}`, {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/${movieId}`, {
       method: "DELETE",
     });
 

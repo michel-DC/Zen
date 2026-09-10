@@ -1,6 +1,8 @@
 "use client";
 
 import MovieCard from "@/components/movie-card";
+import MobileMovieTile from "@/components/mobile/movie-tile";
+import MobileLibraryHeader from "@/components/mobile/library-header";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
@@ -11,7 +13,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { CatalogMovie } from "@/lib/services/catalog-api";
 import { catalogApi } from "@/lib/services/catalog-api";
-import { Search, Trash2 } from "lucide-react";
+import { RefreshCw, Search, Trash2, WifiOff } from "lucide-react";
 import * as React from "react";
 import { toast } from "sonner";
 
@@ -53,6 +55,8 @@ function groupMoviesByAddedDate(movies: CatalogMovie[]): CatalogGroup[] {
 export default function CatalogPage() {
   const [movies, setMovies] = React.useState<CatalogMovie[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [loadFailed, setLoadFailed] = React.useState(false);
+  const [loadAttempt, setLoadAttempt] = React.useState(0);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   const [order, setOrder] = React.useState("recent");
@@ -62,6 +66,7 @@ export default function CatalogPage() {
     (async () => {
       try {
         setIsLoading(true);
+        setLoadFailed(false);
         const doc = await catalogApi.getCatalog();
         // catalogApi returns { movies: CatalogMovie[] }
         const list = doc.movies || [];
@@ -70,6 +75,7 @@ export default function CatalogPage() {
       } catch (err) {
         console.error("Failed to load catalog:", err);
         setMovies([]);
+        if (mounted) setLoadFailed(true);
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -78,7 +84,7 @@ export default function CatalogPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [loadAttempt]);
 
   const filteredMovies = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -135,9 +141,29 @@ export default function CatalogPage() {
     );
   }
 
+  if (loadFailed) {
+    return (
+      <main id="main-content" className="mx-auto flex min-h-[70svh] w-full max-w-md items-center px-5 py-10 md:max-w-xl">
+        <section role="alert" className="w-full rounded-[1.5rem] bg-muted p-6 text-center">
+          <WifiOff className="mx-auto size-6 text-primary" />
+          <h1 className="mt-4 text-xl font-semibold">Catalogue indisponible</h1>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">Le serveur n’a pas répondu et aucun catalogue local n’est encore disponible.</p>
+          <Button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)} className="mt-5 rounded-full">
+            <RefreshCw className="size-4" /> Réessayer
+          </Button>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
-      <section className="space-y-6">
+      <section className="zen-soft-in mx-auto max-w-md md:hidden">
+        <MobileLibraryHeader count={movies.length} />
+        <div className="relative mt-5"><Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><label htmlFor="catalog-search-mobile" className="sr-only">Rechercher dans le catalogue</label><input id="catalog-search-mobile" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrer mes films" className="h-12 w-full rounded-full bg-muted pl-11 pr-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring" /></div>
+        {filteredMovies.length ? <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-6">{filteredMovies.map((movie) => <MobileMovieTile key={movie.id} id={movie.tmdb_id ?? 0} image={movie.poster_url} title={movie.title} year={movie.release_year} onDelete={() => void handleDelete(movie.id)} />)}</div> : <div className="py-16 text-center"><h2 className="font-semibold">{movies.length ? "Aucun film trouvé" : "Catalogue vide"}</h2><p className="mt-2 text-sm text-muted-foreground">{movies.length ? "Essaie une autre recherche." : "Recherche un film pour commencer."}</p></div>}
+      </section>
+      <section className="hidden space-y-6 md:block">
         <PageHeading title="Catalogue" description={`${movies.length} film${movies.length > 1 ? "s" : ""}`}><Button asChild><Link href="/">Ajouter</Link></Button></PageHeading>
         <Label htmlFor="catalog-search" className="sr-only">Rechercher dans le catalogue</Label>
         <Label htmlFor="catalog-order" className="sr-only">Ordre d’ajout</Label>

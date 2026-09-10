@@ -1,31 +1,27 @@
 "use client";
 
-import * as React from "react";
-import { Eye, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import MobileLibraryHeader from "@/components/mobile/library-header";
+import MobileMovieTile from "@/components/mobile/movie-tile";
 import MovieCard from "@/components/movie-card";
-import { SearchField } from "@/components/ui/search-field";
 import { PageHeading } from "@/components/layout/page-heading";
-import { ButtonGroup } from "@/components/ui/button-group";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { catalogApi, type CatalogMovie } from "@/lib/services/catalog-api";
+import { Eye, Trash2 } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
 
 export default function WatchlistPage() {
   const [movies, setMovies] = React.useState<CatalogMovie[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [pending, setPending] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState("");
   React.useEffect(() => { void catalogApi.getCatalog().then((doc) => setMovies(doc.watchlist || [])).catch(() => toast.error("Impossible de charger À voir")).finally(() => setLoading(false)); }, []);
-  const watched = async (id: string) => { setPending(id); try { await catalogApi.markWatchlistMovieAsWatched(id); setMovies((items) => items.filter((item) => item.id !== id)); toast.success("Film ajouté au catalogue"); } catch (error: any) { toast.error(error?.message || "Impossible de transférer ce film"); } finally { setPending(null); } };
-  const remove = async (id: string) => { setPending(id); try { await catalogApi.deleteWatchlistMovie(id); setMovies((items) => items.filter((item) => item.id !== id)); toast.success("Film retiré de À voir"); } catch (error: any) { toast.error(error?.message || "Impossible de supprimer ce film"); } finally { setPending(null); } };
-  const filteredMovies = movies.filter((movie) => {
-    const term = query.trim().toLowerCase();
-    return !term || movie.title.toLowerCase().includes(term) || (movie.director || "").toLowerCase().includes(term);
-  });
-
-  return <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8"><section className="space-y-6">
-    <PageHeading title="À voir" description={`${movies.length} film${movies.length > 1 ? "s" : ""}`}><Button asChild variant="outline"><Link href="/">Ajouter</Link></Button></PageHeading><SearchField id="watchlist-search" label="Rechercher dans la liste" value={query} onChange={setQuery} compact />
-    {loading ? <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{Array.from({ length: 4 }).map((_, index) => <MovieCard.Skeleton key={index} />)}</div> : filteredMovies.length === 0 ? <div className="py-16 text-center"><h2 className="text-xl font-semibold">{movies.length ? "Aucun résultat" : "Liste vide"}</h2></div> : <section className="space-y-4"><div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{filteredMovies.map((movie) => <div key={movie.id} className="flex flex-col gap-3"><MovieCard id={movie.tmdb_id ? Number(movie.tmdb_id) : 0} image={movie.poster_url} title={movie.title} author={movie.director || "Inconnu"} /><div className="flex items-center justify-between gap-3 px-1"><span className="text-xs text-muted-foreground">{movie.release_year || "Année inconnue"}</span><ButtonGroup aria-label="Actions sur le film"><Button size="icon" variant="ghost" aria-label={`Marquer ${movie.title} comme vu`} disabled={pending === movie.id} onClick={() => watched(movie.id)}><Eye /></Button><Button size="icon" variant="ghost" aria-label={`Retirer ${movie.title} de la liste`} disabled={pending === movie.id} onClick={() => remove(movie.id)}><Trash2 /></Button></ButtonGroup></div></div>)}</div></section>}
-  </section></main>;
+  const watched = async (id: string) => { try { await catalogApi.markWatchlistMovieAsWatched(id); setMovies((items) => items.filter((item) => item.id !== id)); toast.success("Film ajouté au catalogue"); } catch (error: any) { toast.error(error?.message || "Impossible de transférer ce film"); } };
+  const remove = async (id: string) => { try { await catalogApi.deleteWatchlistMovie(id); setMovies((items) => items.filter((item) => item.id !== id)); toast.success("Film retiré de À voir"); } catch (error: any) { toast.error(error?.message || "Impossible de retirer ce film"); } };
+  const filtered = movies.filter((movie) => !query.trim() || `${movie.title} ${movie.director || ""}`.toLowerCase().includes(query.trim().toLowerCase()));
+  return (
+    <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
+      <section className="md:hidden"><MobileLibraryHeader count={movies.length} /><div className="relative mt-5"><label htmlFor="watchlist-search-mobile" className="sr-only">Filtrer les films à voir</label><input id="watchlist-search-mobile" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Filtrer les films à voir" className="h-12 w-full rounded-full bg-muted px-4 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring" /></div>{loading ? <div className="mt-6 grid grid-cols-2 gap-3"><div className="aspect-[2/3] animate-pulse rounded-[1.15rem] bg-muted" /><div className="aspect-[2/3] animate-pulse rounded-[1.15rem] bg-muted" /></div> : filtered.length ? <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-6">{filtered.map((movie) => <MobileMovieTile key={movie.id} id={movie.tmdb_id ?? 0} image={movie.poster_url} title={movie.title} year={movie.release_year} onWatched={() => void watched(movie.id)} onDelete={() => void remove(movie.id)} />)}</div> : <div className="py-16 text-center"><h2 className="font-semibold">{movies.length ? "Aucun film trouvé" : "Rien à voir pour le moment"}</h2><p className="mt-2 text-sm text-muted-foreground">Ajoute un film depuis la recherche.</p></div>}</section>
+      <section className="hidden space-y-6 md:block"><PageHeading title="À voir" description={`${movies.length} film${movies.length > 1 ? "s" : ""}`} /><div className="max-w-md"><label htmlFor="watchlist-search" className="sr-only">Rechercher dans la liste</label><input id="watchlist-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Titre ou réalisateur" className="h-10 w-full rounded-lg border bg-background px-3" /></div>{loading ? <p className="text-sm text-muted-foreground">Chargement…</p> : <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{filtered.map((movie) => <div key={movie.id} className="space-y-3"><MovieCard id={movie.tmdb_id ?? 0} image={movie.poster_url} title={movie.title} author={movie.director || "Inconnu"} /><div className="flex gap-2"><Button variant="outline" onClick={() => void watched(movie.id)}><Eye />Vu</Button><Button variant="ghost" onClick={() => void remove(movie.id)}><Trash2 />Retirer</Button></div></div>)}</div>}</section>
+    </main>
+  );
 }

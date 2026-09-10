@@ -1,3 +1,12 @@
+## 10-09-2026
+
+- 17:00 Correction du chargement des films avec délai réseau borné, mutualisation des requêtes catalogue, repli IndexedDB hors ligne et états d’erreur réessayables sur l’accueil et la bibliothèque.
+- 17:00 Correction du service worker PWA afin qu’une navigation indisponible ne renvoie plus silencieusement l’accueil à la place d’une fiche film, avec renouvellement du cache en version 3.
+- 08:05 Refonte mobile-first de Zen selon la maquette validée : accueil épuré, navigation inférieure flottante, recherche dédiée, bibliothèque segmentée, fiche film tactile et adaptation sobre de la découverte.
+- 08:05 Ajout des réglages de thème clair, sombre ou système, de l’installation PWA guidée après une première action utile et de la remise à zéro sécurisée de la mémoire locale.
+- 08:05 Ajout d’un onboarding mobile en trois étapes, des actions rapides par appui long et d’un instantané IndexedDB du catalogue pour la consultation hors ligne.
+- 08:05 Renforcement du service worker avec cache versionné de la coque et des affiches, sans modification du catalogue Cloudflare/R2 ni du rendu desktop existant.
+
 ## 09-09-2026
 
 - 19:43 Migration du backend de production de Render vers Cloudflare Workers avec conservation des routes `/api/v1`, connexion native au catalogue R2 existant et suppression du délai de réveil du serveur.

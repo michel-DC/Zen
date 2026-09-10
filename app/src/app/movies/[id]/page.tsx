@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { movieApi, type DetailedMovie } from "@/lib/services/movie-api";
 import { catalogApi } from "@/lib/services/catalog-api";
 import { extractImagePalette } from "@/lib/image-palette";
-import { ArrowLeft, Star, User } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, Star, User } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -70,8 +70,13 @@ export default function MovieDetailPage() {
   }
 
   return (
-    <main id="main-content" className="w-full px-10 py-8 min-h-screen pb-20">
-      <div className="mx-auto">
+    <main id="main-content" className="min-h-screen w-full px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] md:px-10 md:py-8 md:pb-20">
+      <section className="mx-auto max-w-md md:hidden">
+        <button onClick={handleBack} aria-label="Retour" className="mb-3 flex size-11 items-center justify-center rounded-full bg-background shadow-sm ring-1 ring-border"><ArrowLeft className="size-5" /></button>
+        <div className="relative aspect-[2/3] w-full overflow-hidden rounded-[1.75rem] bg-muted shadow-lg">{isLoading ? <Skeleton className="absolute inset-0" /> : <MoviePoster src={movie?.poster_path ? `https://image.tmdb.org/t/p/w780${movie.poster_path}` : null} alt={movie?.title || "Affiche du film"} priority sizes="100vw" />}</div>
+        {isLoading ? <div className="space-y-3 py-6"><Skeleton className="h-8 w-3/4" /><Skeleton className="h-5 w-1/2" /><Skeleton className="h-20 w-full" /></div> : <div className="py-6"><h1 className="text-[1.9rem] font-bold leading-[1.08] tracking-[-0.04em]">{movie?.title}</h1><div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><span>{movie?.release_year}</span><span aria-hidden="true">·</span><span>{movie?.director || "Réalisateur inconnu"}</span>{movie && <><span aria-hidden="true">·</span><span className="flex items-center gap-1 text-foreground"><Star className="size-4 fill-current text-amber-500" />{movie.vote_average.toFixed(1)}</span></>}</div><div className="mt-4 flex flex-wrap gap-2">{movie?.genres.slice(0, 3).map((genre) => <span key={genre} className="rounded-full bg-muted px-3 py-1 text-xs font-medium">{genre}</span>)}</div><p className="mt-6 text-base leading-6 text-muted-foreground">{movie?.overview || "Aucun synopsis disponible."}</p><div className="mt-7 grid gap-2"><Button className="h-14 rounded-full text-base" onClick={() => addTo("catalog")}>Ajouter au catalogue</Button><Button className="h-14 rounded-full text-base" variant="outline" onClick={() => addTo("watchlist")}><BookmarkPlus />Ajouter à voir</Button></div></div>}
+      </section>
+      <div className="mx-auto hidden md:block">
         <Button
           variant="ghost"
           onClick={handleBack}

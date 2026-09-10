@@ -1,6 +1,8 @@
 import Header from "@/components/layout/header";
 import { LoadingLineProvider } from "@/components/layout/loading-line-provider";
 import PwaRegister from "@/components/pwa-register";
+import MobileNavigation from "@/components/mobile/mobile-navigation";
+import Onboarding from "@/components/mobile/onboarding";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
@@ -23,7 +25,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#111111",
+  themeColor: "#007D66",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -36,7 +39,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
@@ -45,6 +48,8 @@ export default function RootLayout({
               <PwaRegister />
               <Header />
               {children}
+              <Onboarding />
+              <MobileNavigation />
               <Toaster position="bottom-center" />
             </LoadingLineProvider>
           </Suspense>
