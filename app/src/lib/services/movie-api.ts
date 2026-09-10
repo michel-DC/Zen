@@ -23,6 +23,10 @@ export interface DetailedMovie extends Movie {
     profile_path: string | null;
   }[];
   vote_average: number;
+  backdrop_path?: string | null;
+  images?: {
+    backdrops?: Array<{ file_path: string | null }>;
+  };
 }
 
 export interface PaginatedResponse<T> {

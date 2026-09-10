@@ -1,5 +1,16 @@
 ## 10-09-2026
 
+- 19:16 Correction des états d’ajout sur les fiches film : « À voir » et « Catalogue » sont désormais indépendants et restent chacun ajoutables tant que le film n’y figure pas.
+- 19:14 Ajout des affiches à chaque ligne de sélection du Top 3 mobile, avec les contrôles de rang conservés et accessibles.
+- 19:13 Renouvellement du cache TMDB des fiches détaillées afin que le carousel reçoive les multiples images de film demandées.
+- 19:24 Recentrage du composant `MovieCard` dans le Top 3 mobile avec une largeur d’affiche augmentée ; l’action « Changer » est retirée, le remplacement restant disponible depuis le catalogue.
+- 19:12 Refonte de l’affichage mobile du Top 3 en grandes cartes groupées : affiches plus présentes, rang lisible, hiérarchie de titre et action de changement accessible.
+- 19:03 Extension de la réponse TMDB avec les langues d’images de secours et une image principale pour alimenter l’album des fiches film.
+- 19:02 Ajout d’un album horizontal d’images TMDB, d’un carousel de casting et d’une palette de couleurs sur les fiches film mobiles, avec les images également visibles sur desktop.
+- 18:56 Déplacement de l’entrée « Rechercher » avant « Réglages » dans le dock mobile.
+- 17:22 Désactivation immédiate des deux actions d’ajout sur une fiche film lorsque celui-ci est déjà présent dans le catalogue ou dans « À voir ».
+- 17:19 Restauration des informations de réalisateur et de la palette sur les cartes mobiles, avec retour du classement du catalogue sous des dates d’ajout visibles.
+- 17:16 Ajustement du dock mobile à une hauteur intermédiaire de 56 px, plus fine que l’original sans compresser les icônes ni les libellés.
 - 17:10 Regroupement de la recherche avec les quatre entrées de navigation mobile dans une barre unique, avec une sélection plus large, plus neutre et moins saturée.
 - 17:00 Correction du chargement des films avec délai réseau borné, mutualisation des requêtes catalogue, repli IndexedDB hors ligne et états d’erreur réessayables sur l’accueil et la bibliothèque.
 - 17:00 Correction du service worker PWA afin qu’une navigation indisponible ne renvoie plus silencieusement l’accueil à la place d’une fiche film, avec renouvellement du cache en version 3.

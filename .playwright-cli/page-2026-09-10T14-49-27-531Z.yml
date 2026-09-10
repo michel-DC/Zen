@@ -1,0 +1,39 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - paragraph [ref=e4]: Bonjour
+      - heading "Quel film aujourd’hui ?" [level=1] [ref=e5]
+    - link "Rechercher un film" [ref=e6] [cursor=pointer]:
+      - /url: /search
+    - region "Actions rapides" [ref=e11]:
+      - link [ref=e12] [cursor=pointer]:
+        - /url: /catalog
+        - generic [ref=e16]:
+          - strong [ref=e17]: Ma bibliothèque
+          - text: Retrouver mes films
+      - link [ref=e20] [cursor=pointer]:
+        - /url: /recommendations
+        - generic [ref=e25]:
+          - strong [ref=e26]: Trouver une idée
+          - text: À partir de mes goûts
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - heading "Derniers ajouts" [level=2] [ref=e32]
+        - paragraph [ref=e33]: Ma bibliothèque
+      - link "Tout voir" [ref=e34] [cursor=pointer]:
+        - /url: /catalog
+  - navigation "Navigation principale" [ref=e38]:
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - link "Accueil" [ref=e41] [cursor=pointer]:
+          - /url: /
+        - link "Bibliothèque" [ref=e46] [cursor=pointer]:
+          - /url: /catalog
+        - link "Découvrir" [ref=e50] [cursor=pointer]:
+          - /url: /recommendations
+        - link "Réglages" [ref=e55] [cursor=pointer]:
+          - /url: /settings
+      - link "Rechercher" [ref=e60] [cursor=pointer]:
+        - /url: /search
+  - region "Notifications alt+T"
+  - alert [ref=e64]

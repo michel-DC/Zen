@@ -14,7 +14,9 @@ async function fetchTmdb(
   publicUrl.searchParams.set("include_adult", "false");
   for (const [key, value] of Object.entries(params)) publicUrl.searchParams.set(key, String(value));
 
-  const cacheKey = `cache/tmdb${publicUrl.pathname}/${encodeURIComponent(publicUrl.search)}`;
+  // Le détail contient désormais la collection d'images TMDB. La version du
+  // cache évite de servir les anciennes réponses dépourvues de ces images.
+  const cacheKey = `cache/tmdb/v2${publicUrl.pathname}/${encodeURIComponent(publicUrl.search)}`;
   const cached = await env.CATALOG.get(cacheKey);
   if (cached) {
     try {
@@ -51,7 +53,7 @@ export function movieDetails(
     env,
     ctx,
     `/movie/${movieId}`,
-    { append_to_response: "credits,keywords,release_dates,images" },
+    { append_to_response: "credits,keywords,release_dates,images", include_image_language: "fr,null,en" },
     86400,
   );
 }

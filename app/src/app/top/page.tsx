@@ -2,7 +2,6 @@
 
 import MovieCard from "@/components/movie-card";
 import MobileLibraryHeader from "@/components/mobile/library-header";
-import MobileMovieTile from "@/components/mobile/movie-tile";
 import MoviePoster from "@/components/movie-poster";
 import { Button } from "@/components/ui/button";
 import { SearchField } from "@/components/ui/search-field";
@@ -43,6 +42,72 @@ function normalizeTopIds(topThree: Array<string | null> | undefined | null) {
     topThree?.[1] ?? null,
     topThree?.[2] ?? null,
   ] as Array<string | null>;
+}
+
+function MobileTopRankCard({
+  movie,
+  rankIndex,
+}: {
+  movie: CatalogMovie | null;
+  rankIndex: number;
+}) {
+  const rank = rankStyles[rankIndex];
+  const RankIcon = rank.icon;
+  const rankNumber = String(rankIndex + 1).padStart(2, "0");
+
+  if (!movie) {
+    return (
+      <article className="rounded-2xl bg-muted/70 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span
+              className={`flex size-10 items-center justify-center rounded-xl ${rank.badgeClass}`}
+              aria-hidden="true"
+            >
+              <RankIcon className="size-4" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold">{rank.label}</p>
+              <p className="text-sm text-muted-foreground">Place disponible</p>
+            </div>
+          </div>
+          <span className="text-2xl font-semibold tracking-tight text-muted-foreground/70">
+            {rankNumber}
+          </span>
+        </div>
+        <p className="mt-5 text-sm leading-6 text-muted-foreground">
+          Choisis un film du catalogue dans la section plus bas.
+        </p>
+      </article>
+    );
+  }
+
+  return (
+    <article className="flex flex-col items-center">
+      <div className="mb-4 flex w-full max-w-[17rem] items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span
+            className={`flex size-10 items-center justify-center rounded-xl ${rank.badgeClass}`}
+            aria-hidden="true"
+          >
+            <RankIcon className="size-4" />
+          </span>
+          <p className="text-sm font-semibold">{rank.label}</p>
+        </div>
+        <span className="text-2xl font-semibold tracking-tight text-muted-foreground/70">
+          {rankNumber}
+        </span>
+      </div>
+      <div className="w-full max-w-[17rem]">
+        <MovieCard
+          id={movie.tmdb_id ? Number(movie.tmdb_id) : 0}
+          image={movie.poster_url}
+          title={movie.title}
+          author={movie.director || "Inconnu"}
+        />
+      </div>
+    </article>
+  );
 }
 
 function TopMovieCard({
@@ -237,8 +302,66 @@ export default function TopPage() {
     <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
       <section className="md:hidden">
         <MobileLibraryHeader count={topMovies.filter(Boolean).length} />
-        <div className="mt-7 space-y-7">{topMovies.map((movie, index) => <section key={index}><h2 className="mb-3 text-sm font-semibold text-primary">{rankStyles[index].label}</h2>{movie ? <div className="grid grid-cols-[7rem_1fr] gap-4"><MobileMovieTile id={movie.tmdb_id ?? 0} image={movie.poster_url} title={movie.title} year={movie.release_year} onDelete={() => removeMovieFromRank(index)} /><div className="pt-1"><p className="text-sm text-muted-foreground">Position {index + 1}</p><Button className="mt-4 rounded-full" variant="outline" onClick={() => removeMovieFromRank(index)}>Changer</Button></div></div> : <div className="rounded-[1.25rem] bg-muted p-5"><p className="font-semibold">Place disponible</p><p className="mt-1 text-sm text-muted-foreground">Choisis un film ci-dessous.</p></div>}</section>)}</div>
-        <section className="mt-9 border-t pt-7"><h2 className="text-lg font-bold">Choisir un film</h2><div className="mt-4"><SearchField id="top-search-mobile" label="Rechercher dans les films vus" value={query} onChange={setQuery} compact /></div><div className="mt-5 space-y-2">{filteredCatalogMovies.slice(0, 8).map((movie) => <article key={movie.id} className="flex min-h-16 items-center gap-3 rounded-[1rem] px-2 active:bg-muted"><div className="min-w-0 flex-1"><p className="truncate font-semibold">{movie.title}</p><p className="text-sm text-muted-foreground">{movie.release_year || "Année inconnue"}</p></div><ButtonGroup>{rankStyles.map((rank, rankIndex) => <Button key={rank.label} size="sm" variant={topIds[rankIndex] === movie.id ? "default" : "outline"} onClick={() => assignMovieToRank(movie.id, rankIndex)}>{rankIndex + 1}</Button>)}</ButtonGroup></article>)}</div></section>
+        <div className="mt-7 space-y-4">
+          {topMovies.map((movie, index) => (
+            <MobileTopRankCard
+              key={rankStyles[index].label}
+              movie={movie}
+              rankIndex={index}
+            />
+          ))}
+        </div>
+        <section className="mt-9 border-t pt-7">
+          <h2 className="text-lg font-bold">Choisir un film</h2>
+          <div className="mt-4">
+            <SearchField
+              id="top-search-mobile"
+              label="Rechercher dans les films vus"
+              value={query}
+              onChange={setQuery}
+              compact
+            />
+          </div>
+          <div className="mt-5 space-y-3">
+            {filteredCatalogMovies.slice(0, 8).map((movie) => (
+              <article
+                key={movie.id}
+                className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3 rounded-xl p-1 transition-colors active:bg-muted"
+              >
+                <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-muted">
+                  <MoviePoster
+                    src={movie.poster_url}
+                    alt={`Affiche de ${movie.title}`}
+                    sizes="56px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-col justify-between py-0.5">
+                  <div>
+                    <p className="line-clamp-2 font-semibold leading-5">{movie.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {movie.release_year || "Année inconnue"}
+                    </p>
+                  </div>
+                  <ButtonGroup className="mt-3 self-end" aria-label={`Choisir le rang de ${movie.title}`}>
+                    {rankStyles.map((rank, rankIndex) => (
+                      <Button
+                        key={rank.label}
+                        size="sm"
+                        className="size-11"
+                        variant={topIds[rankIndex] === movie.id ? "default" : "outline"}
+                        onClick={() => assignMovieToRank(movie.id, rankIndex)}
+                        aria-label={`Mettre ${movie.title} en ${rank.label}`}
+                      >
+                        {rankIndex + 1}
+                      </Button>
+                    ))}
+                  </ButtonGroup>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       </section>
       <section className="hidden space-y-10 md:block">
         <PageHeading title="Mon top 3" />

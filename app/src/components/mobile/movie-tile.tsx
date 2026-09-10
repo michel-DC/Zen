@@ -1,6 +1,7 @@
 "use client";
 
 import MoviePoster from "@/components/movie-poster";
+import { extractImagePalette, type ImagePaletteColor } from "@/lib/image-palette";
 import { BookmarkPlus, Check, Library, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
@@ -9,6 +10,7 @@ type Props = {
   id: number;
   image?: string | null;
   title: string;
+  author?: string | null;
   year?: number | null;
   onCatalog?: () => void;
   onWatchlist?: () => void;
@@ -16,9 +18,16 @@ type Props = {
   onWatched?: () => void;
 };
 
-export default function MobileMovieTile({ id, image, title, year, onCatalog, onWatchlist, onDelete, onWatched }: Props) {
+export default function MobileMovieTile({ id, image, title, author, year, onCatalog, onWatchlist, onDelete, onWatched }: Props) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const [palette, setPalette] = React.useState<ImagePaletteColor[]>([]);
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(() => {
+    if (!image) { setPalette([]); return; }
+    let active = true;
+    void extractImagePalette(image, 3).then((colors) => { if (active) setPalette(colors); });
+    return () => { active = false; };
+  }, [image]);
   const start = () => { timer.current = setTimeout(() => { setSheetOpen(true); navigator.vibrate?.(18); }, 520); };
   const cancel = () => { if (timer.current) clearTimeout(timer.current); };
   const actions = [
@@ -31,12 +40,15 @@ export default function MobileMovieTile({ id, image, title, year, onCatalog, onW
   return (
     <>
       <article className="min-w-0">
-        <Link href={id ? `/movies/${id}` : "/catalog"} onPointerDown={start} onPointerUp={cancel} onPointerCancel={cancel} onPointerLeave={cancel} onContextMenu={(event) => { if (actions.length) { event.preventDefault(); setSheetOpen(true); } }} className="relative block aspect-[2/3] overflow-hidden rounded-[1.15rem] bg-muted shadow-[0_1px_2px_rgba(0,0,0,0.08)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.985]">
+        <Link href={id ? `/movies/${id}` : "/catalog"} onPointerDown={start} onPointerUp={cancel} onPointerCancel={cancel} onPointerLeave={cancel} onContextMenu={(event) => { if (actions.length) { event.preventDefault(); setSheetOpen(true); } }} className="relative block aspect-[2/3] overflow-hidden rounded-xl bg-muted shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.985]">
           <MoviePoster src={image} alt={title} sizes="(max-width: 767px) 48vw, 240px" />
         </Link>
-        <Link href={id ? `/movies/${id}` : "/catalog"} className="mt-2.5 block px-0.5 focus-visible:outline-2 focus-visible:outline-ring">
-          <h3 className="line-clamp-2 text-[0.94rem] font-semibold leading-[1.2] tracking-[-0.015em]">{title}</h3>
-          {year && <p className="mt-1 text-[0.8rem] text-muted-foreground">{year}</p>}
+        <Link href={id ? `/movies/${id}` : "/catalog"} className="mt-3 block px-1 focus-visible:outline-2 focus-visible:outline-ring">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-foreground/90">{title}</h3>
+          <div className="mt-1 flex items-center justify-between gap-2">
+            <p className="min-w-0 truncate text-xs text-muted-foreground">{author ? `Par ${author}` : year ?? ""}</p>
+            {palette.length > 0 && <span aria-label="Palette de l’affiche" className="flex shrink-0 -space-x-1">{palette.map((color, index) => <i key={color.hex} aria-hidden className={`size-3 rounded-full border border-background ${index === 0 ? "z-30" : index === 1 ? "z-20" : "z-10"}`} style={{ backgroundColor: color.hex }} />)}</span>}
+          </div>
         </Link>
       </article>
       {sheetOpen && (
