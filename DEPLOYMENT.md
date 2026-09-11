@@ -1,43 +1,65 @@
-# Déploiement
+# Mise en production privée de Zen
 
-## Frontend — Vercel
+Zen reste une application personnelle : il n’y a pas de compte, ni de session à
+renouveler manuellement. Le premier appareil est activé une fois avec un code ;
+un cookie signé, `HttpOnly` et `SameSite=Strict`, le reconnaît ensuite pendant un
+an et est renouvelé silencieusement à l’usage.
 
-Le projet Vercel utilise `app/` comme répertoire racine. La variable suivante doit être définie pour les environnements Production et Preview :
+## 1. Worker Cloudflare
 
-```text
-NEXT_PUBLIC_API_URL=https://zen-api.djoumessi-michel08.workers.dev/api/v1
-```
-
-Chaque push sur la branche de production déclenche un nouveau déploiement.
-
-## Backend — Cloudflare Workers
-
-Le backend de production se trouve dans `worker/`. Il utilise une liaison native vers le bucket R2 `catalogue-zen`, une liaison Workers AI et un secret TMDB.
+Depuis `worker/`, créer ou remplacer les deux secrets suivants :
 
 ```powershell
-cd worker
 wrangler secret put TMDB_API_KEY
+wrangler secret put INTERNAL_API_SECRET
 wrangler deploy
 ```
 
-L'URL publique actuelle est :
+`INTERNAL_API_SECRET` est une chaîne aléatoire longue. Elle ne doit pas être
+réutilisée pour un autre service. Le bucket R2 reste privé : aucune clé R2 n’est
+exposée au navigateur.
 
-```text
-https://zen-api.djoumessi-michel08.workers.dev
-```
+## 2. Projet Vercel
 
-La configuration versionnée est dans `worker/wrangler.jsonc`. `TMDB_API_KEY` reste un secret Cloudflare et ne doit jamais être ajouté au fichier.
+Dans **Settings → Environment Variables** du projet Vercel, pour *Production*
+et *Preview*, définir :
 
-## Stratégie IA
+| Variable | Valeur |
+| --- | --- |
+| `ZEN_WORKER_URL` | URL publique du Worker, par exemple `https://zen-api.…workers.dev` |
+| `ZEN_WORKER_INTERNAL_SECRET` | La même valeur que `INTERNAL_API_SECRET` |
+| `ZEN_DEVICE_SIGNING_SECRET` | Une seconde chaîne aléatoire longue, réservée aux cookies Zen |
+| `ZEN_ENROLLMENT_CODE` | Le code personnel utilisé une fois pour activer un nouvel appareil |
 
-- En local, l'ancien backend FastAPI peut toujours utiliser Ollama.
-- En production, le Worker utilise directement Workers AI pour les embeddings ; les palettes sont extraites dans le navigateur à partir des pixels des affiches optimisées.
-- Les appels TMDB sont mis en cache dans R2 afin de rester sous la limite de sous-requêtes du plan Workers gratuit.
-- Les recommandations utilisent un vivier borné à vingt candidats, compatible avec le quota gratuit.
+Le frontend appelle toujours `/api/zen/*` sur son propre domaine. Vercel relaie
+la requête côté serveur vers le Worker et ajoute le secret interne : le navigateur
+ne voit jamais ce secret, ni les accès directs au catalogue R2.
 
-## Contrôles après publication
+Après l’ajout des variables, redéployer Vercel. Sans `ZEN_DEVICE_SIGNING_SECRET`
+et `ZEN_ENROLLMENT_CODE`, la protection par appareil est volontairement désactivée
+en local uniquement ; ne pas laisser cet état en production.
 
-1. Vérifier `https://zen-api.djoumessi-michel08.workers.dev/health`.
-2. Ouvrir `https://zen-movies.vercel.app` et contrôler la navigation mobile et desktop.
-3. Tester l’ajout au catalogue et à la liste « À voir ».
-4. Lancer une recommandation et vérifier dans le panneau de diagnostic que le fournisseur est `cloudflare`.
+## 3. Domaine `zen.hey-michel.me`
+
+Dans **Vercel → Settings → Domains**, ajouter `zen.hey-michel.me`. Vercel
+indiquera l’enregistrement DNS à créer. Dans Cloudflare DNS, créer exactement cet
+enregistrement — Vercel peut fournir un CNAME propre au projet — et le laisser en
+**DNS only** jusqu’à validation par Vercel. Une fois le certificat émis, le proxy
+Cloudflare peut rester désactivé : le HTTPS de Vercel suffit et évite une couche
+supplémentaire inutile.
+
+## Données et IA
+
+Les notes libres, impressions et conversations sont stockées dans `catalog.json`
+sur le bucket R2 privé. Elles ne sont jamais injectées automatiquement dans un
+prompt IA, ni utilisées pour entraîner un modèle. L’IA ne reçoit qu’au moment où
+tu l’appelles :
+
+- pour le journal, le message que tu viens volontairement d’écrire, le contexte
+  public TMDB et les huit derniers messages de cette même conversation ;
+- pour « Ce soir » et les parcours, les métadonnées TMDB publiques ainsi que les
+  signaux structurés explicitement enregistrés (note, émotions, aspects).
+
+Les protections HTTP empêchent l’indexation, l’encapsulation de l’application et
+certains usages de navigateur inutiles. Elles complètent l’isolation Vercel ↔
+Worker ; elles ne remplacent pas la confidentialité des secrets ci-dessus.

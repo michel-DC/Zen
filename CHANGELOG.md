@@ -1,3 +1,16 @@
+## 11-09-2026
+
+- 19:32 Fiabilisation de « Ce soir » avec le mode JSON structuré de Workers AI, une température réduite et une lecture directe de la réponse typée afin de conserver le classement et les justifications du modèle.
+- 19:29 Amélioration globale de l’expérience mobile iOS : transitions fonctionnelles, restauration du défilement, adaptation au clavier, statut réseau et synchronisation, navigation iPad, feuilles d’action accessibles, balayage des cartes, catalogue optimisé et fiche film recentrée sur ses actions principales.
+- 19:22 Alignement de la date de compatibilité Cloudflare sur la version du runtime Wrangler afin de permettre le démarrage et les tests locaux du Worker.
+- 18:20 Correction de la fiche des films historiques : le journal après-film accepte désormais les entrées créées avant l’apparition des visionnages, de l’historique de notes et des conversations ; les carrousels restent contenus dans la largeur de la page.
+- 09:40 Synchronisation immédiate de l’état de la fiche après transfert au catalogue, afin de réactiver correctement l’action « À voir » sans rechargement.
+- 09:35 Correction du transfert « À voir → Catalogue » : l’ajout depuis une fiche transfère désormais le film sans doublon et les deux parcours de transfert le classent à la date du jour.
+- 09:36 Refonte du dock de navigation mobile dans un style iOS translucide, avec capsule de sélection glissante, retour tactile animé, zones d’appui accessibles, adaptation au mode sombre et respect de la réduction des animations.
+- 10:08 Ajout du journal « Après le film » : notation par demi-étoile, favori, ressenti, aspects appréciés, historique de notes, conversations isolées par visionnage et gestion correcte des revisionnages.
+- 10:08 Ajout de « Ce soir » et des parcours cinéma adaptatifs : choix contextuel en trois propositions, report ou refus mémorisé, parcours de quatre à six films, décalage de planning et adaptation à partir des retours structurés.
+- 10:08 Mise en place du socle de confidentialité de production : proxy Vercel vers Worker protégé par secret interne, activation unique d’appareil, blocage de l’indexation, en-têtes de protection et documentation de déploiement sur `zen.hey-michel.me`.
+
 ## 10-09-2026
 
 - 19:16 Correction des états d’ajout sur les fiches film : « À voir » et « Catalogue » sont désormais indépendants et restent chacun ajoutables tant que le film n’y figure pas.

@@ -16,8 +16,8 @@ function corsHeaders(request: Request, env: Env): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": selectedOrigin,
     "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Zen-Internal-Secret",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
     Vary: "Origin",
   };
 }
@@ -48,6 +48,18 @@ export async function readJson(request: Request): Promise<Record<string, unknown
     if (!value || typeof value !== "object" || Array.isArray(value)) {
       throw new Error("invalid body");
     }
+    return value as Record<string, unknown>;
+  } catch {
+    throw new HttpError(422, "Corps JSON invalide");
+  }
+}
+
+export async function readJsonOrEmpty(request: Request): Promise<Record<string, unknown>> {
+  const body = await request.text();
+  if (!body.trim()) return {};
+  try {
+    const value: unknown = JSON.parse(body);
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("invalid body");
     return value as Record<string, unknown>;
   } catch {
     throw new HttpError(422, "Corps JSON invalide");

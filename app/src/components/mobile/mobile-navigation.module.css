@@ -1,0 +1,205 @@
+.navigation {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  display: none;
+  padding: 0 0.875rem max(0.75rem, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.dock {
+  --dock-padding: 0.25rem;
+  --active-index: 0;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: min(100%, 27rem);
+  min-height: 4rem;
+  margin-inline: auto;
+  padding: var(--dock-padding);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in oklab, var(--foreground) 9%, transparent);
+  border-radius: 1.45rem;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, white 32%, transparent), transparent 42%),
+    color-mix(in oklab, var(--background) 83%, transparent);
+  box-shadow:
+    0 0.5px 0 color-mix(in oklab, white 75%, transparent) inset,
+    0 10px 35px rgb(0 0 0 / 13%),
+    0 2px 8px rgb(0 0 0 / 7%);
+  backdrop-filter: saturate(1.45) blur(24px);
+  -webkit-backdrop-filter: saturate(1.45) blur(24px);
+  pointer-events: auto;
+}
+
+.selection {
+  position: absolute;
+  z-index: -1;
+  top: var(--dock-padding);
+  bottom: var(--dock-padding);
+  left: var(--dock-padding);
+  width: calc((100% - (var(--dock-padding) * 2)) / 5);
+  border: 1px solid color-mix(in oklab, var(--primary) 14%, transparent);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, white 28%, transparent), transparent),
+    color-mix(in oklab, var(--primary) 13%, var(--background));
+  box-shadow:
+    0 1px 0 color-mix(in oklab, white 65%, transparent) inset,
+    0 3px 12px color-mix(in oklab, var(--primary) 12%, transparent);
+  transform: translate3d(calc(var(--active-index) * 100%), 0, 0);
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.125rem;
+  border-radius: 1.15rem;
+  color: color-mix(in oklab, var(--foreground) 55%, transparent);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    color 180ms ease-out,
+    transform 160ms ease-out;
+}
+
+.item:active {
+  transform: scale(0.94);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.item[data-active] {
+  color: var(--primary);
+}
+
+.iconWrap {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  place-items: center;
+  transform-origin: 50% 80%;
+}
+
+.icon {
+  width: 1.22rem;
+  height: 1.22rem;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item[data-active] .iconWrap {
+  animation: nav-icon-arrive 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.item:not([data-active]):active .icon {
+  transform: translateY(-1px);
+}
+
+.label {
+  max-width: 100%;
+  overflow: hidden;
+  padding-inline: 0.1rem;
+  font-size: clamp(0.56rem, 2.35vw, 0.65rem);
+  font-weight: 560;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    opacity 180ms ease-out,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item[data-active] .label {
+  font-weight: 660;
+  transform: translateY(-0.5px);
+}
+
+@keyframes nav-icon-arrive {
+  0% {
+    transform: translateY(1px) scale(0.94);
+  }
+  100% {
+    transform: translateY(-1px) scale(1.04);
+  }
+}
+
+.pending {
+  position: absolute;
+  top: 0.32rem;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 120ms ease-out 100ms, transform 160ms cubic-bezier(0.16, 1, 0.3, 1) 100ms;
+}
+
+.pending[data-pending] {
+  opacity: 0.75;
+  transform: scale(1);
+}
+
+@media (max-width: 767px) {
+  .navigation {
+    display: block;
+  }
+}
+
+@media (max-width: 359px) {
+  .navigation {
+    padding-inline: 0.5rem;
+  }
+
+  .dock {
+    min-height: 3.75rem;
+  }
+
+  .item {
+    min-height: 3.25rem;
+  }
+}
+
+:global(.dark) .dock {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 7%), transparent 42%),
+    color-mix(in oklab, var(--background) 78%, transparent);
+  box-shadow:
+    0 0.5px 0 rgb(255 255 255 / 14%) inset,
+    0 12px 36px rgb(0 0 0 / 34%),
+    0 2px 10px rgb(0 0 0 / 24%);
+}
+
+:global(html[data-zen-keyboard-open]) .navigation {
+  opacity: 0;
+  transform: translateY(120%);
+  transition: opacity 140ms ease-out, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selection,
+  .item,
+  .icon,
+  .label {
+    transition-duration: 0.01ms;
+  }
+
+  .item[data-active] .iconWrap {
+    animation: none;
+    transform: translateY(-1px) scale(1.04);
+  }
+}

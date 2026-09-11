@@ -12,8 +12,14 @@ Backend de production de Zen. Il remplace le service FastAPI hébergé sur Rende
 
 ```powershell
 wrangler secret put TMDB_API_KEY
+wrangler secret put INTERNAL_API_SECRET
 wrangler deploy
 ```
+
+`INTERNAL_API_SECRET` doit être une valeur aléatoire longue et identique à
+`ZEN_WORKER_INTERNAL_SECRET` sur Vercel. Dès qu'il est défini, toutes les routes
+`/api/v1/catalog/*` refusent les appels directs : elles ne peuvent plus être
+atteintes qu'à travers le proxy serveur de Zen.
 
 Le Worker est configuré dans `wrangler.jsonc`. Les secrets ne doivent pas être ajoutés au dépôt.
 

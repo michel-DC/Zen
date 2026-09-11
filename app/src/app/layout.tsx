@@ -2,6 +2,8 @@ import Header from "@/components/layout/header";
 import { LoadingLineProvider } from "@/components/layout/loading-line-provider";
 import PwaRegister from "@/components/pwa-register";
 import MobileNavigation from "@/components/mobile/mobile-navigation";
+import MobileExperience from "@/components/mobile/mobile-experience";
+import TabletNavigation from "@/components/mobile/tablet-navigation";
 import Onboarding from "@/components/mobile/onboarding";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -11,6 +13,8 @@ import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Zen",
+  robots: { index: false, follow: false },
+  formatDetection: { telephone: false },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -47,7 +51,8 @@ export default function RootLayout({
             <LoadingLineProvider>
               <PwaRegister />
               <Header />
-              {children}
+              <TabletNavigation />
+              <MobileExperience>{children}</MobileExperience>
               <Onboarding />
               <MobileNavigation />
               <Toaster position="bottom-center" />

@@ -67,6 +67,22 @@ export function relatedMovies(
   return fetchTmdb(env, ctx, `/movie/${movieId}/${kind}`, {}, 21600);
 }
 
+export function discoverMovies(
+  env: Env,
+  ctx: ExecutionContextLike,
+  params: Record<string, string | number | boolean>,
+): Promise<JsonObject> {
+  return fetchTmdb(env, ctx, "/discover/movie", { sort_by: "popularity.desc", ...params }, 1800);
+}
+
+export function searchMovies(
+  env: Env,
+  ctx: ExecutionContextLike,
+  query: string,
+): Promise<JsonObject> {
+  return fetchTmdb(env, ctx, "/search/movie", { query, page: 1 }, 300);
+}
+
 export async function listMovies(
   env: Env,
   ctx: ExecutionContextLike,

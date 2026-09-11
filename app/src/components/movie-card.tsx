@@ -13,11 +13,13 @@ import MoviePoster from "@/components/movie-poster";
 import { getColorName } from "@/lib/color-names";
 import { extractImagePalette, type ImagePaletteColor } from "@/lib/image-palette";
 import { catalogApi } from "@/lib/services/catalog-api";
+import { syncJourneyAfterViewing } from "@/lib/journey-progress";
 import { Copy } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
+import AfterFilmDialog, { type AfterFilmPayload } from "@/components/journal/after-film-dialog";
 
 type MovieCardProps = {
   id: number;
@@ -41,6 +43,7 @@ export function MovieCard({
   onAddedToCatalog,
 }: MovieCardProps) {
   const [imagePalette, setImagePalette] = React.useState<ImagePaletteColor[]>([]);
+  const [afterFilmOpen, setAfterFilmOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!image || palette.length) {
@@ -72,6 +75,10 @@ export function MovieCard({
   const pathname = usePathname();
 
   const handleAddToCatalog = async () => {
+    setAfterFilmOpen(true);
+  };
+
+  const saveAfterFilm = async (reflection: AfterFilmPayload) => {
     try {
       const payload = {
         title,
@@ -81,16 +88,19 @@ export function MovieCard({
         poster_url: image || null,
         tmdb_id: id || null,
         genres: [],
-        watched_at: null,
+        watched_at: reflection.watched_at,
         rating: null,
         favorite: false,
         notes: null,
       };
-      await catalogApi.createMovie(payload);
+      const record = await catalogApi.createMovie(payload);
+      const result = await catalogApi.createViewing(record.id, { ...reflection, is_rewatch: false });
+      void syncJourneyAfterViewing(result.movie, result.viewing.id).catch(() => undefined);
       onAddedToCatalog?.(id);
       toast.success("Film ajouté au catalogue");
-    } catch (err: any) {
-      toast.error(err?.message || "Impossible d'ajouter au catalogue");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Impossible d'ajouter au catalogue");
+      throw err;
     }
   };
 
@@ -98,8 +108,8 @@ export function MovieCard({
     try {
       await catalogApi.createWatchlistMovie({ title, release_year: null, director: author || null, overview: null, poster_url: image || null, tmdb_id: id || null, genres: [], watched_at: null, rating: null, favorite: false, notes: null });
       toast.success("Film ajouté à À voir");
-    } catch (err: any) {
-      toast.error(err?.message || "Impossible d'ajouter ce film à À voir");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Impossible d'ajouter ce film à À voir");
     }
   };
 
@@ -208,6 +218,7 @@ export function MovieCard({
           </Dialog>
         )}
       </div>
+      <AfterFilmDialog open={afterFilmOpen} title={title} onOpenChange={setAfterFilmOpen} onSave={saveAfterFilm} />
     </article>
   );
 }

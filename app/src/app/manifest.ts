@@ -5,12 +5,14 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Zen",
     short_name: "Zen",
     description: "Catalogue et recherche de films Zen.",
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",
+    display_override: ["window-controls-overlay", "standalone"],
     background_color: "#ffffff",
     theme_color: "#007D66",
-    orientation: "portrait",
+    categories: ["entertainment", "lifestyle"],
     icons: [
       {
         src: "/icons/pwa-192.png",

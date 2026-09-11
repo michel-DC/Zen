@@ -25,6 +25,8 @@ export async function saveCatalogSnapshot(document: CatalogDocument) {
     transaction.onerror = () => reject(transaction.error);
   });
   database.close();
+  localStorage.setItem("zen:last-catalog-sync", new Date().toISOString());
+  window.dispatchEvent(new Event("zen-catalog-synced"));
 }
 
 export async function readCatalogSnapshot(): Promise<CatalogDocument | null> {
@@ -40,6 +42,7 @@ export async function readCatalogSnapshot(): Promise<CatalogDocument | null> {
 }
 
 export async function clearLocalAppCache() {
+  localStorage.removeItem("zen:last-catalog-sync");
   if ("caches" in window) {
     const keys = await caches.keys();
     await Promise.all(keys.filter((key) => key.startsWith("zen-")).map((key) => caches.delete(key)));

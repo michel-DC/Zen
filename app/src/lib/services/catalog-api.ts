@@ -13,8 +13,21 @@ export type CatalogMovie = {
   genres: string[];
   watched_at: string | null;
   rating: number | null;
+  rating_history: Array<{ rating: number; recorded_at: string; viewing_id: string | null }>;
   favorite: boolean;
   notes: string | null;
+  viewings: Array<{
+    id: string;
+    watched_at: string;
+    is_rewatch: boolean;
+    reflection_status: "pending" | "complete";
+    impression: string | null;
+    emotions: string[];
+    appreciated_aspects: string[];
+    conversation: Array<{ id: string; role: "user" | "assistant"; content: string; created_at: string }>;
+    created_at: string;
+    updated_at: string;
+  }>;
   created_at: string;
   updated_at: string;
 };
@@ -25,6 +38,33 @@ export type CatalogDocument = {
   movies: CatalogMovie[];
   watchlist: CatalogMovie[];
   top_three: Array<string | null>;
+  deferred_movies: Array<{ tmdb_id: number; until: string }>;
+  tonight_history: Array<{ tmdb_id: number; chosen_at: string }>;
+  journeys: Journey[];
+  active_journey_id: string | null;
+};
+
+export type Journey = {
+  id: string;
+  title: string;
+  intent: string;
+  cadence_days: number;
+  status: "active" | "saved" | "completed";
+  steps: Array<{
+    id: string;
+    tmdb_id: number;
+    title: string;
+    director: string;
+    poster_path: string | null;
+    release_year: number | null;
+    rationale: string;
+    scheduled_for: string;
+    status: "planned" | "completed";
+    completed_viewing_id: string | null;
+  }>;
+  revisions: Array<{ created_at: string; reason: string; previous_step_tmdb_ids: number[] }>;
+  created_at: string;
+  updated_at: string;
 };
 
 export type RecommendationResult = {
@@ -119,9 +159,9 @@ export const catalogApi = {
     });
     return parseResponse<CatalogMovie>(response);
   },
-  async markWatchlistMovieAsWatched(movieId: string): Promise<CatalogMovie> {
-    const response = await fetchApi(`${API_BASE_URL}/catalog/watchlist/${movieId}/watched`, { method: "POST" });
-    return parseResponse<CatalogMovie>(response);
+  async markWatchlistMovieAsWatched(movieId: string, payload: { watched_at?: string; rating?: number | null; favorite?: boolean; impression?: string | null; emotions?: string[]; appreciated_aspects?: string[] } = {}): Promise<{ movie: CatalogMovie; viewing: CatalogMovie["viewings"][number] }> {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/watchlist/${movieId}/watched`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ watched_at: new Date().toLocaleDateString("en-CA"), ...payload }) });
+    return parseResponse<{ movie: CatalogMovie; viewing: CatalogMovie["viewings"][number] }>(response);
   },
   async deleteWatchlistMovie(movieId: string): Promise<void> {
     const response = await fetchApi(`${API_BASE_URL}/catalog/watchlist/${movieId}`, { method: "DELETE" });
@@ -156,5 +196,65 @@ export const catalogApi = {
       const payload = (await response.json()) as { detail?: string };
       throw new Error(payload.detail || "Une erreur est survenue");
     }
+  },
+
+  async createViewing(movieId: string, payload: { watched_at: string; rating?: number | null; favorite?: boolean; impression?: string | null; emotions?: string[]; appreciated_aspects?: string[]; is_rewatch?: boolean }) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/${movieId}/viewings`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    return parseResponse<{ movie: CatalogMovie; viewing: CatalogMovie["viewings"][number] }>(response);
+  },
+
+  async updateViewing(movieId: string, viewingId: string, payload: { watched_at?: string; rating?: number | null; favorite?: boolean; impression?: string | null; emotions?: string[]; appreciated_aspects?: string[] }) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/${movieId}/viewings/${viewingId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    return parseResponse<{ movie: CatalogMovie; viewing: CatalogMovie["viewings"][number] }>(response);
+  },
+
+  async updateRating(movieId: string, rating: number | null, viewingId?: string) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/${movieId}/rating`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rating, viewing_id: viewingId }) });
+    return parseResponse<CatalogMovie>(response);
+  },
+
+  async continueConversation(movieId: string, viewingId: string, message: string) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/${movieId}/viewings/${viewingId}/conversation`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) }, 30_000);
+    return parseResponse<{ viewing: CatalogMovie["viewings"][number]; response: string }>(response);
+  },
+
+  async getTonightRecommendations(payload: { mode: "watchlist" | "surprise"; available_minutes: number; emotional_intensity: number; pace: "slow" | "balanced" | "paced"; continuity: "continue" | "change"; context?: string; session_exclusions?: number[] }) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/tonight/recommendations`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, 30_000);
+    return parseResponse<{ data: Array<{ id: number; title: string; poster_path: string | null; director: string; release_year: number | null; runtime: number | null; rationale: string; source: "watchlist" | "surprise" }> }>(response);
+  },
+
+  async decideTonight(payload: { tmdb_id: number; decision: "chosen" | "defer" | "not_interested"; until?: string }) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/tonight/decisions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    return parseResponse<{ message: string }>(response);
+  },
+
+  async getJourneys() {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/journeys`, { cache: "no-store" });
+    return parseResponse<{ journeys: Journey[]; active_journey_id: string | null }>(response);
+  },
+
+  async createJourney(payload: { intent: string; title?: string; count?: number; cadence_days?: number; start_date?: string }) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/journeys`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }, 45_000);
+    return parseResponse<Journey>(response);
+  },
+
+  async activateJourney(journeyId: string) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/journeys/${journeyId}/activate`, { method: "POST" });
+    return parseResponse<Journey>(response);
+  },
+
+  async postponeJourneyStep(journeyId: string, stepId: string, payload: { days?: 1 | 3 | 7; date?: string }) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/journeys/${journeyId}/steps/${stepId}/postpone`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    return parseResponse<Journey>(response);
+  },
+
+  async completeJourneyStep(journeyId: string, stepId: string, viewingId: string) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/journeys/${journeyId}/steps/${stepId}/complete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ viewing_id: viewingId }) });
+    return parseResponse<Journey>(response);
+  },
+
+  async adaptJourneyStep(journeyId: string, stepId: string, viewingId: string) {
+    const response = await fetchApi(`${API_BASE_URL}/catalog/journeys/${journeyId}/steps/${stepId}/adapt`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ viewing_id: viewingId }) }, 30_000);
+    return parseResponse<Journey>(response);
   },
 };

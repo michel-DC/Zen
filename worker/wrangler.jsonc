@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "zen-api",
   "main": "src/index.ts",
-  "compatibility_date": "2026-09-09",
+  "compatibility_date": "2026-05-03",
   "observability": {
     "enabled": true
   },

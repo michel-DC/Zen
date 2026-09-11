@@ -9,6 +9,8 @@ import { ArrowLeft, Search, WifiOff, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
+import AfterFilmDialog, { type AfterFilmPayload } from "@/components/journal/after-film-dialog";
+import { syncJourneyAfterViewing } from "@/lib/journey-progress";
 
 function moviePayload(movie: Movie): CatalogMoviePayload {
   return { title: movie.title, release_year: movie.release_year, director: movie.director, overview: movie.overview, poster_url: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null, tmdb_id: movie.id, genres: [], watched_at: null, rating: null, favorite: false, notes: null };
@@ -22,6 +24,8 @@ export default function SearchPage() {
   const [movies, setMovies] = React.useState<Movie[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [failed, setFailed] = React.useState(false);
+  const [afterFilmMovie, setAfterFilmMovie] = React.useState<Movie | null>(null);
+  const goBack = () => { if (window.history.length > 1) router.back(); else router.push("/"); };
 
   React.useEffect(() => {
     if (!submitted) return;
@@ -32,19 +36,29 @@ export default function SearchPage() {
 
   const submit = (event: React.FormEvent) => { event.preventDefault(); const value = query.trim(); router.push(value ? `/search?q=${encodeURIComponent(value)}` : "/search"); };
   const add = async (movie: Movie, target: "catalog" | "watchlist") => {
+    if (target === "catalog") { setAfterFilmMovie(movie); return; }
     try {
-      if (target === "catalog") await catalogApi.createMovie(moviePayload(movie));
-      else await catalogApi.createWatchlistMovie(moviePayload(movie));
+      await catalogApi.createWatchlistMovie(moviePayload(movie));
       window.dispatchEvent(new Event("zen-useful-action"));
-      toast.success(target === "catalog" ? "Ajouté au catalogue" : "Ajouté à À voir");
+      toast.success("Ajouté à À voir");
     } catch (error: unknown) { toast.error(error instanceof Error ? error.message : "Impossible d’ajouter ce film"); }
+  };
+  const saveAfterFilm = async (payload: AfterFilmPayload) => {
+    if (!afterFilmMovie) return;
+    try {
+      const record = await catalogApi.createMovie({ ...moviePayload(afterFilmMovie), watched_at: payload.watched_at });
+      const result = await catalogApi.createViewing(record.id, { ...payload, is_rewatch: false });
+      void syncJourneyAfterViewing(result.movie, result.viewing.id).catch(() => undefined);
+      window.dispatchEvent(new Event("zen-useful-action"));
+      toast.success("Ajouté au catalogue");
+    } catch (error) { toast.error(error instanceof Error ? error.message : "Impossible d’ajouter ce film"); throw error; }
   };
 
   return (
     <main id="main-content" className="mx-auto w-full max-w-7xl px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center gap-2 md:hidden">
-          <button onClick={() => router.back()} aria-label="Retour" className="flex size-11 shrink-0 items-center justify-center rounded-full active:bg-muted"><ArrowLeft className="size-5" /></button>
+          <button onClick={goBack} aria-label="Retour à la page précédente" className="flex size-11 shrink-0 items-center justify-center rounded-full active:bg-muted"><ArrowLeft className="size-5" /></button>
         </div>
         <form role="search" onSubmit={submit} className="flex min-h-14 items-center gap-2 rounded-full bg-muted px-4 md:rounded-xl">
           <Search className="size-5 shrink-0 text-muted-foreground" />
@@ -61,6 +75,7 @@ export default function SearchPage() {
             : <p className="mt-3 text-sm text-muted-foreground">Saisis un titre, un réalisateur ou un mot-clé.</p>}
         </section>
       </div>
+      <AfterFilmDialog open={Boolean(afterFilmMovie)} title={afterFilmMovie?.title || "ce film"} onOpenChange={(open) => { if (!open) setAfterFilmMovie(null); }} onSave={saveAfterFilm} />
     </main>
   );
 }

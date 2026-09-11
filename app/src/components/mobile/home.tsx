@@ -11,7 +11,6 @@ export default function MobileHome() {
   const [document, setDocument] = React.useState<CatalogDocument | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [loadFailed, setLoadFailed] = React.useState(false);
-  const [offline] = React.useState(() => typeof navigator !== "undefined" && !navigator.onLine);
   const loadCatalog = React.useCallback(async () => {
     setLoading(true);
     setLoadFailed(false);
@@ -33,7 +32,6 @@ export default function MobileHome() {
         <h1 className="mt-1 text-[2rem] font-bold leading-none tracking-[-0.045em]">Quel film aujourd’hui ?</h1>
       </header>
       <Link href="/search" className="flex min-h-14 items-center gap-3 rounded-full bg-muted px-5 text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.99]"><Search className="size-5" /><span className="text-base">Rechercher un film</span></Link>
-      {offline && <p className="mt-3 rounded-xl bg-primary/8 px-3 py-2 text-sm text-primary">Mode hors ligne · dernier catalogue disponible</p>}
       <section className="mt-9 space-y-2" aria-label="Actions rapides">
         <Link href="/catalog" className="flex min-h-[4.5rem] items-center gap-4 rounded-[1.25rem] px-2 active:bg-muted"><span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Library className="size-5" /></span><span className="min-w-0 flex-1"><strong className="block text-base">Ma bibliothèque</strong><small className="text-sm text-muted-foreground">Retrouver mes films</small></span><ArrowRight className="size-5 text-muted-foreground" /></Link>
         <Link href="/recommendations" className="flex min-h-[4.5rem] items-center gap-4 rounded-[1.25rem] px-2 active:bg-muted"><span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Sparkles className="size-5" /></span><span className="min-w-0 flex-1"><strong className="block text-base">Trouver une idée</strong><small className="text-sm text-muted-foreground">À partir de mes goûts</small></span><ArrowRight className="size-5 text-muted-foreground" /></Link>

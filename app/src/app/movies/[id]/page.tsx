@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { movieApi, type DetailedMovie } from "@/lib/services/movie-api";
 import { catalogApi } from "@/lib/services/catalog-api";
+import type { CatalogMovie } from "@/lib/services/catalog-api";
+import FilmJournal from "@/components/journal/film-journal";
+import AfterFilmDialog, { type AfterFilmPayload } from "@/components/journal/after-film-dialog";
+import { syncJourneyAfterViewing } from "@/lib/journey-progress";
 import { extractImagePalette } from "@/lib/image-palette";
 import { ArrowLeft, BookmarkPlus, Star, User } from "lucide-react";
 import Image from "next/image";
@@ -60,8 +64,10 @@ export default function MovieDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [catalogIds, setCatalogIds] = useState<Set<number>>(new Set());
+  const [catalogMovie, setCatalogMovie] = useState<CatalogMovie | null>(null);
   const [watchlistIds, setWatchlistIds] = useState<Set<number>>(new Set());
   const [addingTo, setAddingTo] = useState<"catalog" | "watchlist" | null>(null);
+  const [afterFilmOpen, setAfterFilmOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -92,12 +98,14 @@ export default function MovieDetailPage() {
       if (!active) return;
       setCatalogIds(new Set(document.movies.map((item) => item.tmdb_id).filter((id): id is number => id !== null)));
       setWatchlistIds(new Set(document.watchlist.map((item) => item.tmdb_id).filter((id): id is number => id !== null)));
+      setCatalogMovie(document.movies.find((item) => item.tmdb_id === Number(params.id)) ?? null);
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
 
   const handleBack = () => {
-    router.back();
+    if (window.history.length > 1) router.back();
+    else router.push("/catalog");
   };
   const isInCatalog = useMemo(() => Boolean(movie && catalogIds.has(movie.id)), [catalogIds, movie]);
   const isInWatchlist = useMemo(() => Boolean(movie && watchlistIds.has(movie.id)), [movie, watchlistIds]);
@@ -105,14 +113,29 @@ export default function MovieDetailPage() {
   const addTo = async (target: "catalog" | "watchlist") => {
     const alreadyInTarget = target === "catalog" ? isInCatalog : isInWatchlist;
     if (!movie || alreadyInTarget || addingTo) return;
+    if (target === "catalog") { setAfterFilmOpen(true); return; }
     const payload = { title: movie.title, release_year: movie.release_year, director: movie.director, overview: movie.overview, poster_url: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null, tmdb_id: movie.id, genres: movie.genres, watched_at: null, rating: null, favorite: false, notes: null };
     try {
       setAddingTo(target);
-      if (target === "catalog") await catalogApi.createMovie(payload); else await catalogApi.createWatchlistMovie(payload);
-      if (target === "catalog") setCatalogIds((ids) => new Set(ids).add(movie.id));
-      else setWatchlistIds((ids) => new Set(ids).add(movie.id));
-      toast.success(target === "catalog" ? "Film ajouté au catalogue" : "Film ajouté à À voir");
-    } catch (error: any) { toast.error(error?.message || "Impossible d’ajouter ce film"); } finally { setAddingTo(null); }
+      await catalogApi.createWatchlistMovie(payload);
+      setWatchlistIds((ids) => new Set(ids).add(movie.id));
+      toast.success("Film ajouté à À voir");
+    } catch (error: unknown) { toast.error(error instanceof Error ? error.message : "Impossible d’ajouter ce film"); } finally { setAddingTo(null); }
+  };
+  const saveAfterFilm = async (reflection: AfterFilmPayload) => {
+    if (!movie) return;
+    const payload = { title: movie.title, release_year: movie.release_year, director: movie.director, overview: movie.overview, poster_url: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null, tmdb_id: movie.id, genres: movie.genres, watched_at: reflection.watched_at, rating: null, favorite: false, notes: null };
+    try {
+      setAddingTo("catalog");
+      const record = await catalogApi.createMovie(payload);
+      const result = await catalogApi.createViewing(record.id, { ...reflection, is_rewatch: false });
+      setCatalogMovie(result.movie);
+      void syncJourneyAfterViewing(result.movie, result.viewing.id).catch(() => undefined);
+      setCatalogIds((ids) => new Set(ids).add(movie.id));
+      setWatchlistIds((ids) => { const next = new Set(ids); next.delete(movie.id); return next; });
+      toast.success("Film ajouté au catalogue");
+    } catch (error: unknown) { toast.error(error instanceof Error ? error.message : "Impossible d’ajouter ce film"); throw error; }
+    finally { setAddingTo(null); }
   };
 
   if (error) {
@@ -127,11 +150,21 @@ export default function MovieDetailPage() {
   }
 
   return (
-    <main id="main-content" className="min-h-screen w-full px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] md:px-10 md:py-8 md:pb-20">
+    <main id="main-content" className="min-h-screen w-full overflow-x-clip px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] md:px-10 md:py-8 md:pb-20">
       <section className="mx-auto max-w-md md:hidden">
-        <button onClick={handleBack} aria-label="Retour" className="mb-3 flex size-11 items-center justify-center rounded-full bg-background shadow-sm ring-1 ring-border"><ArrowLeft className="size-5" /></button>
-        <div className="relative aspect-[2/3] w-full overflow-hidden rounded-[1.75rem] bg-muted shadow-lg">{isLoading ? <Skeleton className="absolute inset-0" /> : <MoviePoster src={movie?.poster_path ? `https://image.tmdb.org/t/p/w780${movie.poster_path}` : null} alt={movie?.title || "Affiche du film"} priority sizes="100vw" />}</div>
-        {isLoading ? <div className="space-y-3 py-6"><Skeleton className="h-8 w-3/4" /><Skeleton className="h-5 w-1/2" /><Skeleton className="h-20 w-full" /></div> : movie && <div className="py-6"><h1 className="text-[1.9rem] font-bold leading-[1.08] tracking-[-0.04em]">{movie.title}</h1><div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><span>{movie.release_year}</span><span aria-hidden="true">·</span><span>{movie.director || "Réalisateur inconnu"}</span><span aria-hidden="true">·</span><span className="flex items-center gap-1 text-foreground"><Star className="size-4 fill-current text-amber-500" />{movie.vote_average.toFixed(1)}</span></div><div className="mt-4 flex flex-wrap gap-2">{movie.genres.slice(0, 3).map((genre) => <span key={genre} className="rounded-full bg-muted px-3 py-1 text-xs font-medium">{genre}</span>)}</div><p className="mt-6 text-base leading-6 text-muted-foreground">{movie.overview || "Aucun synopsis disponible."}</p><StillsCarousel movie={movie} /><CastCarousel movie={movie} /><ColorPalette movie={movie} /><div className="mt-8 grid gap-2"><Button className="h-14 rounded-full text-base" disabled={isInCatalog || Boolean(addingTo)} onClick={() => addTo("catalog")}>{addingTo === "catalog" ? "Ajout en cours…" : isInCatalog ? "Déjà dans le catalogue" : "Ajouter au catalogue"}</Button><Button className="h-14 rounded-full text-base" variant="outline" disabled={isInWatchlist || Boolean(addingTo)} onClick={() => addTo("watchlist")}><BookmarkPlus />{addingTo === "watchlist" ? "Ajout en cours…" : isInWatchlist ? "Déjà dans À voir" : "Ajouter à voir"}</Button></div></div>}
+        <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl bg-muted">
+          <button onClick={handleBack} aria-label="Retour à la page précédente" className="absolute left-3 top-3 z-20 flex size-11 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-md active:scale-95"><ArrowLeft className="size-5" /></button>
+          {isLoading ? <Skeleton className="absolute inset-0" /> : <MoviePoster src={movie?.poster_path ? `https://image.tmdb.org/t/p/w780${movie.poster_path}` : null} alt={movie?.title || "Affiche du film"} priority sizes="100vw" />}
+        </div>
+        {isLoading ? <div className="space-y-3 py-6"><Skeleton className="h-8 w-3/4" /><Skeleton className="h-5 w-1/2" /><Skeleton className="h-20 w-full" /></div> : movie && <div className="py-6">
+          <h1 className="text-[1.9rem] font-bold leading-[1.08] tracking-[-0.04em]">{movie.title}</h1>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><span>{movie.release_year}</span><span aria-hidden="true">·</span><span>{movie.director || "Réalisateur inconnu"}</span><span aria-hidden="true">·</span><span className="flex items-center gap-1 text-foreground"><Star className="size-4 fill-current text-amber-500" />{movie.vote_average.toFixed(1)}</span></div>
+          <div className="mt-4 flex flex-wrap gap-2">{movie.genres.slice(0, 3).map((genre) => <span key={genre} className="rounded-full bg-muted px-3 py-1 text-xs font-medium">{genre}</span>)}</div>
+          <div className="mt-6 grid gap-2"><Button className="h-14 rounded-full text-base" disabled={isInCatalog || Boolean(addingTo)} onClick={() => addTo("catalog")}>{addingTo === "catalog" ? "Ajout en cours…" : isInCatalog ? "Déjà dans le catalogue" : "Ajouter au catalogue"}</Button><Button className="h-14 rounded-full text-base" variant="outline" disabled={isInWatchlist || Boolean(addingTo)} onClick={() => addTo("watchlist")}><BookmarkPlus />{addingTo === "watchlist" ? "Ajout en cours…" : isInWatchlist ? "Déjà dans À voir" : "Ajouter à voir"}</Button></div>
+          <p className="mt-7 text-base leading-6 text-muted-foreground">{movie.overview || "Aucun synopsis disponible."}</p>
+          <StillsCarousel movie={movie} /><CastCarousel movie={movie} /><ColorPalette movie={movie} />
+          {catalogMovie && <FilmJournal movie={catalogMovie} onUpdated={setCatalogMovie} />}
+        </div>}
       </section>
       <div className="mx-auto hidden md:block">
         <Button
@@ -160,7 +193,7 @@ export default function MovieDetailPage() {
           </div>
 
           {/* Informations */}
-          <div className="flex flex-col">
+          <div className="flex min-w-0 flex-col">
             {isLoading ? (
               <div className="space-y-4">
                 <Skeleton className="h-10 w-3/4 bg-foreground/10" />
@@ -236,6 +269,8 @@ export default function MovieDetailPage() {
                       "Aucune description disponible pour ce film."}
                   </p>
                 </div>
+
+                {catalogMovie && <FilmJournal movie={catalogMovie} onUpdated={setCatalogMovie} />}
 
                 {movie && <StillsCarousel movie={movie} />}
 
@@ -313,6 +348,7 @@ export default function MovieDetailPage() {
           </div>
         </div>
       </div>
+      <AfterFilmDialog open={afterFilmOpen} title={movie?.title || "ce film"} onOpenChange={setAfterFilmOpen} onSave={saveAfterFilm} />
     </main>
   );
 }

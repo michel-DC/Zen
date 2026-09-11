@@ -237,6 +237,41 @@ body {
   [data-slot="button"], [data-slot="input"] { transition: none; }
 }
 
+.zen-mobile-scene {
+  width: 100%;
+}
+
+.zen-connection-status {
+  position: fixed;
+  z-index: 65;
+  top: max(0.75rem, env(safe-area-inset-top));
+  left: 50%;
+  display: flex;
+  min-height: 2.75rem;
+  max-width: calc(100vw - 2rem);
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 999px;
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 14%);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transform: translateX(-50%);
+  animation: zen-status-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.zen-connection-status svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.zen-tablet-sidebar {
+  display: none;
+}
+
 @media (max-width: 767px) {
   :root { --radius: 0.875rem; }
   body {
@@ -249,6 +284,10 @@ body {
   }
   .zen-discover article h3 { font-size: 0.875rem; }
   .zen-discover article p { font-size: 0.75rem; }
+  .zen-catalog-group {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 44rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -274,9 +313,106 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes zen-status-in {
+  from { opacity: 0; transform: translate(-50%, -0.5rem); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 .zen-soft-in { animation: zen-soft-in 220ms cubic-bezier(0.25, 1, 0.5, 1) both; }
 .zen-sheet-in { animation: zen-sheet-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .zen-soft-in, .zen-sheet-in { animation: none; }
+  .zen-soft-in, .zen-sheet-in, .zen-mobile-scene, .zen-connection-status { animation: none; }
+}
+
+@media (max-width: 767px) {
+  .zen-mobile-scene {
+    animation: zen-soft-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  [data-slot="dialog-overlay"] {
+    background: rgb(0 0 0 / 28%);
+    backdrop-filter: blur(2px);
+  }
+
+  [data-slot="dialog-content"] {
+    top: auto !important;
+    bottom: 0;
+    left: 0 !important;
+    width: 100vw;
+    max-width: none !important;
+    max-height: min(92dvh, 48rem);
+    overflow-y: auto;
+    border-radius: 1.25rem 1.25rem 0 0;
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    translate: none !important;
+    transform: none !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  body {
+    padding-left: 5.5rem;
+  }
+
+  .zen-tablet-sidebar {
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    z-index: 45;
+    display: flex;
+    width: 5.5rem;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid var(--border);
+    background: color-mix(in oklab, var(--background) 94%, transparent);
+    padding: max(1rem, env(safe-area-inset-top)) 0.5rem max(1rem, env(safe-area-inset-bottom));
+    backdrop-filter: blur(18px);
+  }
+
+  .zen-tablet-logo {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border-radius: 0.875rem;
+  }
+
+  .zen-tablet-sidebar nav {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.375rem;
+  }
+
+  .zen-tablet-sidebar nav a {
+    display: flex;
+    min-height: 4.25rem;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-radius: 0.875rem;
+    color: var(--muted-foreground);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    transition: background-color 160ms ease-out, color 160ms ease-out;
+  }
+
+  .zen-tablet-sidebar nav a svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .zen-tablet-sidebar nav a[data-active] {
+    background: var(--muted);
+    color: var(--primary);
+  }
+
+  .zen-tablet-sidebar a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
 }

@@ -9,6 +9,7 @@ INFO.md
 __pycache__/
 *.py[cod]
 .wrangler/
+worker/.dev.vars
 .vercel/
 .impeccable/live/
 verification-*.png
