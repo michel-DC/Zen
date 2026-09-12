@@ -1,6 +1,6 @@
 import { loadCatalog } from "./catalog";
 import { HttpError } from "./http";
-import { mapConcurrent, movieDetails, searchMovies } from "./tmdb";
+import { mapConcurrent, movieDetails, personMovieCredits, searchMovies, searchPeople } from "./tmdb";
 import type { CatalogMovie, Env, ExecutionContextLike, Journey, JourneyStep, JsonObject } from "./types";
 
 function text(value: unknown, max: number, label: string): string {
@@ -60,6 +60,44 @@ async function candidateQueries(env: Env, intent: string): Promise<string[]> {
   return queries.length ? queries.slice(0, 3) : [intent];
 }
 
+function creatorNameFromIntent(intent: string): string | null {
+  const match = intent.match(/(?:cinéma|filmographie|films?)\s+(?:du|de la|de l['’]|de)\s+(?:(?:réalisateur|réalisatrice|cinéaste|producteur|productrice|auteur|autrice)\s+)?(.+)$/i);
+  const name = match?.[1]?.trim().replace(/[.?!]+$/, "") ?? "";
+  return name.length >= 2 && name.length <= 100 ? name : null;
+}
+
+function normalizedName(value: unknown): string {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/gi, "")
+    .toLowerCase();
+}
+
+async function creatorMovieIds(env: Env, ctx: ExecutionContextLike, intent: string): Promise<number[]> {
+  const creatorName = creatorNameFromIntent(intent);
+  if (!creatorName) return [];
+
+  const people = await searchPeople(env, ctx, creatorName);
+  const peopleResults = array(people.results);
+  const namedPeople = peopleResults.filter((candidate) => normalizedName(candidate.name).length > 0);
+  const expectedName = normalizedName(creatorName);
+  const person = namedPeople.find((candidate) => normalizedName(candidate.name) === expectedName)
+    ?? namedPeople.find((candidate) => normalizedName(candidate.name).includes(expectedName) || expectedName.includes(normalizedName(candidate.name)))
+    ?? namedPeople.find((candidate) => candidate.known_for_department === "Directing")
+    ?? peopleResults[0];
+  const personId = Number(person?.id);
+  if (!personId) return [];
+
+  const credits = await personMovieCredits(env, ctx, personId);
+  const crew = array(credits.crew);
+  const directingCredits = crew.filter((credit) => credit.job === "Director");
+  return (directingCredits.length ? directingCredits : crew)
+    .filter((credit) => Number(credit.id) && typeof credit.release_date === "string")
+    .sort((left, right) => String(left.release_date).localeCompare(String(right.release_date)))
+    .map((credit) => Number(credit.id));
+}
+
 export async function createJourney(
   env: Env,
   ctx: ExecutionContextLike,
@@ -72,9 +110,10 @@ export async function createJourney(
   const startDate = date(payload.start_date, new Date().toISOString().slice(0, 10));
   const document = await loadCatalog(env);
   const watched = new Set(document.movies.map((movie) => movie.tmdb_id).filter((id): id is number => Boolean(id)));
-  const queries = await candidateQueries(env, intent);
+  const creatorIds = await creatorMovieIds(env, ctx, intent);
+  const queries = creatorIds.length ? [] : await candidateQueries(env, intent);
   const results = await mapConcurrent(queries, 3, (query) => searchMovies(env, ctx, query));
-  const seedIds = [...new Set(results.flatMap((result) => array(result.results).map((item) => Number(item.id))).filter(Boolean))].filter((id) => !watched.has(id)).slice(0, 32);
+  const seedIds = [...new Set([...creatorIds, ...results.flatMap((result) => array(result.results).map((item) => Number(item.id)))].filter(Boolean))].filter((id) => !watched.has(id)).slice(0, 32);
   const details = await mapConcurrent(seedIds, 5, (id) => movieDetails(env, ctx, id));
   const today = new Date().toISOString().slice(0, 10);
   const candidates = details.filter((detail) => detail.adult !== true && typeof detail.release_date === "string" && detail.release_date <= today);

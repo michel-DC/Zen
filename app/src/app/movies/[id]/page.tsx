@@ -333,6 +333,7 @@ export default function MovieDetailPage() {
                             src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
                             alt={actor.name}
                             fill
+                            sizes="(min-width: 1024px) 9vw, (min-width: 768px) 18vw, 42vw"
                             className="object-cover"
                           />
                         ) : (

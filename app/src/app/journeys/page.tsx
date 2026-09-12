@@ -1,6 +1,7 @@
 "use client";
 
 import MoviePoster from "@/components/movie-poster";
+import MobileTonightTabs from "@/components/mobile/tonight-tabs";
 import { Button } from "@/components/ui/button";
 import { catalogApi, type Journey } from "@/lib/services/catalog-api";
 import { CalendarClock, Plus, Sparkles } from "lucide-react";
@@ -44,7 +45,7 @@ export default function JourneysPage() {
 
   return (
     <main id="main-content" className="zen-mobile-page mx-auto w-full max-w-5xl px-5 pb-8 pt-[max(2rem,env(safe-area-inset-top))] md:px-8 md:py-10">
-      <header className="max-w-xl"><p className="zen-mobile-kicker">Parcours</p><h1 className="zen-mobile-title mt-2 md:text-4xl">Voir les films dans le bon ordre.</h1><p className="zen-mobile-lead mt-3">Zen compose un chemin de quatre à six films inédits, puis s’ajuste à tes retours.</p></header>
+      <header className="max-w-xl"><p className="zen-mobile-kicker">Parcours</p><h1 className="zen-mobile-title mt-2 md:text-4xl">Voir les films dans le bon ordre.</h1><p className="zen-mobile-lead mt-3">Zen compose un chemin de quatre à six films inédits, puis s’ajuste à tes retours.</p><MobileTonightTabs /></header>
       <form onSubmit={create} className="zen-mobile-form mt-8 bg-muted p-4 md:p-6">
         <label htmlFor="journey-intent" className="text-sm font-semibold">Qu’aimerais-tu explorer ?</label>
         <textarea id="journey-intent" value={intent} onChange={(event) => setIntent(event.target.value)} maxLength={500} required placeholder="Par exemple : découvrir le cinéma japonais intimiste contemporain" className="mt-2 min-h-28 w-full rounded-xl bg-background p-4 text-base outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring" />

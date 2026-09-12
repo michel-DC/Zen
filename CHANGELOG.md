@@ -1,5 +1,10 @@
 ## 12-09-2026
 
+- 11:10 Fiabilisation des parcours centrés sur une personne : Zen recherche désormais la personne sur TMDB, vérifie son nom exact pour éviter les homonymes et, pour un cinéaste, compose le parcours à partir de ses réalisations plutôt que de tous ses crédits techniques.
+- 10:53 Fiabilisation du workflow recherche → catalogue : déploiement des routes de visionnage du Worker Cloudflare, conservation du formulaire après erreur, suppression de l’overlay Next.js, distinction correcte entre premier visionnage et revisionnage, et dimensions responsives explicites pour les portraits du casting.
+- 10:45 Raccourcissement de l’introduction de « Ce soir » pour une lecture immédiate et sans retour à la ligne superflu sur mobile.
+- 10:41 Remplacement du bouton isolé « Parcours » par des tabs mobiles « Ce soir / Parcours », identiques au modèle de navigation de la Bibliothèque et présents sur les deux pages.
+- 10:41 Correction de la recherche de films sur mobile et ordinateur : construction valide de l’URL relative du proxy, encodage fiable des paramètres et remplacement du faux diagnostic hors ligne par une erreur réessayable.
 - 10:27 Refonte `/polish` et `/clarify` du chat après-film : placement rapproché de la note, accueil conversationnel sans fausse bulle, suggestions lisibles, messages mieux hiérarchisés, compositeur iOS tactile, libellés plus précis et reprise d’envoi explicite.
 - 08:50 Rendu de la discussion IA accessible pour tous les films du catalogue, y compris les entrées historiques sans visionnage : le premier message initialise explicitement le visionnage associé avant d’enregistrer la conversation.
 - 08:30 Refonte approfondie de l’expérience mobile iOS : véritable conversation IA dans le journal, compositeur multilignes avec suggestions et reprise sur erreur, formulaires « Ce soir » et Parcours restructurés, onboarding et activation accessibles, recherche fiabilisée, surfaces harmonisées et cibles tactiles portées à 44 px minimum.

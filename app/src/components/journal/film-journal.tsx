@@ -27,12 +27,12 @@ export default function FilmJournal({ movie, onUpdated }: { movie: CatalogMovie;
   const ratingHistory = movie.rating_history ?? [];
   const lastViewing = viewings.at(-1);
 
-  const saveRewatch = async (payload: AfterFilmPayload) => {
+  const saveViewing = async (payload: AfterFilmPayload) => {
     try {
-      const result = await catalogApi.createViewing(movie.id, payload);
+      const result = await catalogApi.createViewing(movie.id, { ...payload, is_rewatch: Boolean(lastViewing) });
       onUpdated(result.movie);
       void syncJourneyAfterViewing(result.movie, result.viewing.id).catch(() => undefined);
-      toast.success("Revisionnage ajouté");
+      toast.success(lastViewing ? "Revisionnage ajouté" : "Visionnage ajouté");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Impossible d’ajouter ce visionnage");
       throw error;
@@ -83,11 +83,11 @@ export default function FilmJournal({ movie, onUpdated }: { movie: CatalogMovie;
         <div><p className="text-sm font-medium text-primary">Après le film</p><h2 id="journal-title" className="mt-1 text-xl font-bold tracking-[-0.03em]">Ton histoire avec ce film</h2></div>
         <button type="button" onClick={() => void toggleFavorite()} aria-pressed={movie.favorite} aria-label={movie.favorite ? "Retirer des favoris" : "Ajouter aux favoris"} className={`flex size-11 shrink-0 items-center justify-center rounded-full ${movie.favorite ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}><Heart className={movie.favorite ? "size-5 fill-current" : "size-5"} /></button>
       </div>
-      <div className="mt-5 flex items-center justify-between rounded-2xl bg-muted p-4"><div><p className="text-sm text-muted-foreground">Note actuelle</p><div className="mt-1"><Stars rating={movie.rating} /></div></div><button type="button" onClick={() => setRewatchOpen(true)} className="flex min-h-11 items-center gap-2 rounded-full bg-background px-4 text-sm font-semibold"><RotateCcw className="size-4" />Revisionner</button></div>
+      <div className="mt-5 flex items-center justify-between rounded-2xl bg-muted p-4"><div><p className="text-sm text-muted-foreground">Note actuelle</p><div className="mt-1"><Stars rating={movie.rating} /></div></div><button type="button" onClick={() => setRewatchOpen(true)} className="flex min-h-11 items-center gap-2 rounded-full bg-background px-4 text-sm font-semibold"><RotateCcw className="size-4" />{lastViewing ? "Revisionner" : "Ajouter un visionnage"}</button></div>
       {ratingHistory.length > 1 && <details className="mt-4 rounded-2xl bg-muted p-4"><summary className="cursor-pointer text-sm font-semibold">Évolution de ta note</summary><ol className="mt-3 space-y-2 text-sm text-muted-foreground">{[...ratingHistory].reverse().map((entry) => <li key={`${entry.recorded_at}-${entry.rating}`} className="flex justify-between gap-3"><span>{dateLabel(entry.recorded_at)}</span><span className="font-semibold text-foreground">{entry.rating.toLocaleString("fr-FR")}/5</span></li>)}</ol></details>}
       <JournalConversation movieTitle={movie.title} messages={lastViewing?.conversation ?? []} pending={pendingMessage} onSend={send} initialViewingDate={lastViewing ? null : dateForFirstViewing(movie)} />
       <div className="mt-6 space-y-3">{[...viewings].reverse().map((viewing) => <article key={viewing.id} className="rounded-2xl bg-muted p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{viewing.is_rewatch ? "Revisionnage" : "Premier visionnage"}</p><p className="mt-1 text-sm text-muted-foreground">{dateLabel(viewing.watched_at)}</p></div>{viewing.reflection_status === "pending" && <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-muted-foreground">À compléter</span>}</div>{viewing.impression && <p className="mt-4 text-sm leading-6">{viewing.impression}</p>}{((viewing.emotions ?? []).length > 0 || (viewing.appreciated_aspects ?? []).length > 0) && <div className="mt-4 flex flex-wrap gap-2">{[...(viewing.emotions ?? []), ...(viewing.appreciated_aspects ?? [])].map((item) => <span key={item} className="rounded-full bg-background px-3 py-1 text-xs font-medium">{item.replaceAll("_", " ")}</span>)}</div>}</article>)}</div>
-      <AfterFilmDialog open={rewatchOpen} title={movie.title} onOpenChange={setRewatchOpen} onSave={saveRewatch} />
+      <AfterFilmDialog open={rewatchOpen} title={movie.title} onOpenChange={setRewatchOpen} onSave={saveViewing} />
     </section>
   );
 }

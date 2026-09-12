@@ -50,14 +50,15 @@ export const movieApi = {
     filter?: string,
     genre?: string,
   ): Promise<PaginatedResponse<Movie>> {
-    const url = new URL(`${API_BASE_URL}/movies`);
-    url.searchParams.append("page", page.toString());
-    url.searchParams.append("limit", limit.toString());
-    if (search) url.searchParams.append("search", search);
-    if (filter) url.searchParams.append("filter", filter);
-    if (genre) url.searchParams.append("genre", genre);
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) params.set("search", search);
+    if (filter) params.set("filter", filter);
+    if (genre) params.set("genre", genre);
 
-    const response = await fetchApi(url);
+    const response = await fetchApi(`${API_BASE_URL}/movies?${params.toString()}`);
     if (!response.ok) throw new Error("Failed to fetch movies");
     return response.json();
   },

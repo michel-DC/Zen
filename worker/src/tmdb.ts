@@ -83,6 +83,22 @@ export function searchMovies(
   return fetchTmdb(env, ctx, "/search/movie", { query, page: 1 }, 300);
 }
 
+export function searchPeople(
+  env: Env,
+  ctx: ExecutionContextLike,
+  query: string,
+): Promise<JsonObject> {
+  return fetchTmdb(env, ctx, "/search/person", { query, page: 1 }, 86400);
+}
+
+export function personMovieCredits(
+  env: Env,
+  ctx: ExecutionContextLike,
+  personId: number,
+): Promise<JsonObject> {
+  return fetchTmdb(env, ctx, `/person/${personId}/movie_credits`, {}, 86400);
+}
+
 export async function listMovies(
   env: Env,
   ctx: ExecutionContextLike,
