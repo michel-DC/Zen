@@ -20,7 +20,7 @@ function NavigationPendingState() {
 
 export default function MobileNavigation() {
   const pathname = usePathname();
-  if (pathname.startsWith("/movies/")) return null;
+  if (pathname.startsWith("/movies/") || pathname === "/unlock") return null;
 
   const activeIndex = Math.max(
     items.findIndex((item) => item.matches.includes(pathname)),

@@ -11,6 +11,7 @@ const navigationItems = [
 ];
 export default function Header() {
   const pathname = usePathname();
+  if (pathname === "/unlock") return null;
   return <header className="sticky top-0 z-40 hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:block">
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">Aller au contenu</a>
     <div className="flex h-14 w-full items-center gap-6 px-4 sm:px-6 lg:px-8">

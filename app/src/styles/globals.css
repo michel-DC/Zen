@@ -272,12 +272,297 @@ body {
   display: none;
 }
 
+.zen-mobile-kicker {
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.zen-mobile-title {
+  max-width: 18ch;
+  font-size: 2rem;
+  font-weight: 750;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.zen-mobile-lead {
+  max-width: 38rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  text-wrap: pretty;
+}
+
+.zen-mobile-form,
+.zen-mobile-empty {
+  border-radius: 1rem;
+}
+
+.zen-journal-chat {
+  margin-top: 2rem;
+  border-block: 1px solid var(--border);
+  padding-block: 1.5rem 1rem;
+}
+
+.zen-journal-chat__header {
+  padding-inline: 0.25rem;
+}
+
+.zen-journal-chat__header h3 {
+  max-width: 28rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.zen-journal-chat__header p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  max-width: 34rem;
+  margin-top: 0.4rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}
+
+.zen-journal-chat__header svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+  margin-top: 0.17rem;
+  color: var(--primary);
+}
+
+.zen-journal-chat__messages {
+  display: flex;
+  max-height: min(32rem, 62vh);
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  margin-top: 1.5rem;
+  padding: 0.25rem;
+  scroll-padding-block: 1rem;
+  overscroll-behavior: contain;
+}
+
+.zen-journal-chat__messages--empty {
+  max-height: none;
+  overflow: visible;
+}
+
+.zen-chat-welcome {
+  padding-block: 0.25rem 0.5rem;
+}
+
+.zen-chat-welcome__question {
+  max-width: 24rem;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+}
+
+.zen-chat-welcome__hint,
+.zen-chat-welcome__date {
+  margin-top: 0.35rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.3rem;
+}
+
+.zen-chat-welcome__date {
+  max-width: 34rem;
+  margin-top: 0.75rem;
+}
+
+.zen-chat-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.zen-chat-row--user {
+  align-items: flex-end;
+}
+
+.zen-chat-speaker {
+  padding-inline: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  font-weight: 650;
+  line-height: 1rem;
+}
+
+.zen-chat-bubble {
+  max-width: min(88%, 34rem);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.875rem;
+  line-height: 1.45rem;
+}
+
+.zen-chat-bubble--assistant {
+  border-radius: 0.35rem 0.95rem 0.95rem 0.95rem;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.zen-chat-bubble--user {
+  border-radius: 0.95rem 0.95rem 0.35rem 0.95rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.zen-journal-chat__starters {
+  display: grid;
+  margin-top: 1rem;
+  border-block: 1px solid var(--border);
+}
+
+.zen-journal-chat__starters button {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.625rem 0.25rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: color 160ms ease-out, padding-inline 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zen-journal-chat__starters button:last-child { border-bottom: 0; }
+.zen-journal-chat__starters button span { color: var(--muted-foreground); }
+
+@media (hover: hover) {
+  .zen-journal-chat__starters button:hover {
+    padding-inline: 0.5rem;
+    color: var(--primary);
+  }
+}
+
+.zen-journal-chat__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  border-radius: 1rem;
+  background: var(--muted);
+  padding: 0.375rem;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: box-shadow 160ms ease-out, background-color 160ms ease-out;
+}
+
+.zen-journal-chat__composer textarea {
+  min-height: 2.75rem;
+  max-height: 7.5rem;
+  min-width: 0;
+  flex: 1;
+  resize: none;
+  overflow-y: auto;
+  border: 0;
+  background: transparent;
+  padding: 0.7rem 0.55rem 0.55rem 0.75rem;
+  outline: none;
+}
+
+.zen-journal-chat__composer:focus-within {
+  background: var(--background);
+  box-shadow: inset 0 0 0 2px var(--ring);
+}
+
+.zen-journal-chat__composer button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms ease-out;
+}
+
+.zen-journal-chat__composer button:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.zen-journal-chat__composer button:disabled {
+  opacity: 0.28;
+}
+
+.zen-journal-chat__composer button svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.zen-journal-chat__privacy {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.25rem 0;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  line-height: 1rem;
+}
+
+.zen-journal-chat__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  color: var(--destructive);
+  font-size: 0.8125rem;
+}
+
+.zen-journal-chat__error button {
+  min-height: 2.75rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.zen-chat-typing {
+  display: flex;
+  min-width: 3.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.zen-chat-typing > span:not(.sr-only) {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  animation: zen-chat-dot 900ms ease-in-out infinite;
+}
+
+.zen-chat-typing > span:nth-child(2) { animation-delay: 120ms; }
+.zen-chat-typing > span:nth-child(3) { animation-delay: 240ms; }
+
+@keyframes zen-chat-dot {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-0.2rem); }
+}
+
 @media (max-width: 767px) {
   :root { --radius: 0.875rem; }
   body {
     min-width: 20rem;
     padding-bottom: calc(6.75rem + env(safe-area-inset-bottom));
   }
+  .zen-journal-chat__shortcut { display: none; }
   .zen-discover .grid:has(> article) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem !important;
@@ -287,6 +572,11 @@ body {
   .zen-catalog-group {
     content-visibility: auto;
     contain-intrinsic-size: auto 44rem;
+  }
+  .zen-mobile-page input,
+  .zen-mobile-page textarea,
+  .zen-mobile-page select {
+    scroll-margin-bottom: 8rem;
   }
 }
 
@@ -322,7 +612,7 @@ body {
 .zen-sheet-in { animation: zen-sheet-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .zen-soft-in, .zen-sheet-in, .zen-mobile-scene, .zen-connection-status { animation: none; }
+  .zen-soft-in, .zen-sheet-in, .zen-mobile-scene, .zen-connection-status, .zen-chat-typing > span:not(.sr-only) { animation: none; }
 }
 
 @media (max-width: 767px) {
@@ -336,17 +626,10 @@ body {
   }
 
   [data-slot="dialog-content"] {
-    top: auto !important;
-    bottom: 0;
-    left: 0 !important;
-    width: 100vw;
-    max-width: none !important;
     max-height: min(92dvh, 48rem);
     overflow-y: auto;
     border-radius: 1.25rem 1.25rem 0 0;
     padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
-    translate: none !important;
-    transform: none !important;
   }
 }
 

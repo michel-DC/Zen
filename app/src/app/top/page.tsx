@@ -301,7 +301,7 @@ export default function TopPage() {
   return (
     <main id="main-content" className="w-full px-4 py-8 sm:px-6 lg:px-8">
       <section className="md:hidden">
-        <MobileLibraryHeader count={topMovies.filter(Boolean).length} />
+        <MobileLibraryHeader count={catalogMovies.length} />
         <div className="mt-7 space-y-4">
           {topMovies.map((movie, index) => (
             <MobileTopRankCard

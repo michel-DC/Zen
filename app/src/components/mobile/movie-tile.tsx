@@ -21,14 +21,17 @@ type Props = {
 
 export default function MobileMovieTile({ id, image, title, author, year, onCatalog, onWatchlist, onDelete, onWatched }: Props) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [palette, setPalette] = React.useState<ImagePaletteColor[]>([]);
+  const [paletteResult, setPaletteResult] = React.useState<{ source: string; colors: ImagePaletteColor[] } | null>(null);
+  const palette = paletteResult && paletteResult.source === image ? paletteResult.colors : [];
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const pointerOrigin = React.useRef<{ x: number; y: number } | null>(null);
   const preventNavigation = React.useRef(false);
   React.useEffect(() => {
-    if (!image) { setPalette([]); return; }
+    if (!image) return;
     let active = true;
-    void extractImagePalette(image, 3).then((colors) => { if (active) setPalette(colors); });
+    void extractImagePalette(image, 3).then((colors) => {
+      if (active) setPaletteResult({ source: image, colors });
+    });
     return () => { active = false; };
   }, [image]);
   const cancelTimer = () => { if (timer.current) { clearTimeout(timer.current); timer.current = null; } };
@@ -76,7 +79,10 @@ export default function MobileMovieTile({ id, image, title, author, year, onCata
           </div>
         </Link>
       </article>
-      <DialogContent showCloseButton={false} className="gap-2 p-3 sm:max-w-sm">
+      <DialogContent
+        showCloseButton={false}
+        className="bottom-2 left-2 right-2 w-auto max-w-none max-h-[calc(100dvh-1rem)] gap-2 overflow-y-auto rounded-xl p-3 sm:max-w-none md:right-auto md:bottom-auto md:left-1/2 md:w-full md:max-w-sm"
+      >
         <div aria-hidden="true" className="mx-auto mb-1 h-1 w-9 rounded-full bg-border md:hidden" />
         <DialogHeader className="px-3 pb-2 pt-1">
           <DialogTitle className="truncate text-base">{title}</DialogTitle>

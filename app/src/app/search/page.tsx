@@ -30,6 +30,8 @@ export default function SearchPage() {
   React.useEffect(() => {
     if (!submitted) return;
     let active = true;
+    setLoading(true);
+    setFailed(false);
     movieApi.getMovies(1, 24, submitted).then((result) => { if (active) setMovies(result.data); }).catch(() => { if (active) setFailed(true); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [submitted]);
@@ -55,24 +57,23 @@ export default function SearchPage() {
   };
 
   return (
-    <main id="main-content" className="mx-auto w-full max-w-7xl px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 md:py-8 lg:px-8">
+    <main id="main-content" className="zen-mobile-page mx-auto w-full max-w-7xl px-5 pb-8 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
-        <div className="flex items-center gap-2 md:hidden">
-          <button onClick={goBack} aria-label="Retour à la page précédente" className="flex size-11 shrink-0 items-center justify-center rounded-full active:bg-muted"><ArrowLeft className="size-5" /></button>
-        </div>
-        <form role="search" onSubmit={submit} className="flex min-h-14 items-center gap-2 rounded-full bg-muted px-4 md:rounded-xl">
+        <div className="flex items-center gap-2">
+          <button onClick={goBack} aria-label="Retour à la page précédente" className="flex size-11 shrink-0 items-center justify-center rounded-full active:bg-muted md:hidden"><ArrowLeft className="size-5" /></button>
+        <form role="search" onSubmit={submit} className="flex min-h-14 min-w-0 flex-1 items-center gap-2 rounded-2xl bg-muted px-4 md:rounded-xl">
           <Search className="size-5 shrink-0 text-muted-foreground" />
           <label htmlFor="global-search" className="sr-only">Rechercher un film</label>
           <input id="global-search" autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un film" className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground" />
           {query && <button type="button" onClick={() => setQuery("")} aria-label="Effacer la recherche" className="flex size-11 items-center justify-center rounded-full"><X className="size-4" /></button>}
-        </form>
+        </form></div>
         <section className="mt-8" aria-live="polite">
           <div className="flex items-end justify-between gap-4"><div><h1 className="text-2xl font-bold tracking-[-0.035em]">{submitted ? "Résultats" : "Recherche"}</h1>{submitted && <p className="mt-1 text-sm text-muted-foreground">Pour « {submitted} »</p>}</div>{!loading && submitted && !failed && <span className="text-sm text-muted-foreground">{movies.length} film{movies.length > 1 ? "s" : ""}</span>}</div>
           {loading ? <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:grid-cols-4">{Array.from({ length: 8 }).map((_, index) => <Skeleton key={index} className="aspect-[2/3] rounded-[1.15rem]" />)}</div>
             : failed ? <div className="mt-12 text-center"><WifiOff className="mx-auto size-6 text-muted-foreground" /><h2 className="mt-3 font-semibold">Recherche indisponible hors ligne</h2><p className="mt-1 text-sm text-muted-foreground">Reconnecte-toi pour chercher un film.</p></div>
             : movies.length ? <><div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-6 md:hidden">{movies.map((movie) => <MobileMovieTile key={movie.id} id={movie.id} image={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null} title={movie.title} author={movie.director} year={movie.release_year} onCatalog={() => void add(movie, "catalog")} onWatchlist={() => void add(movie, "watchlist")} />)}</div><div className="mt-5 hidden grid-cols-4 gap-6 md:grid">{movies.map((movie) => <MovieCard key={movie.id} id={movie.id} image={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : null} title={movie.title} author={movie.director || "Inconnu"} palette={movie.palette} />)}</div></>
             : submitted ? <div className="py-16 text-center"><h2 className="font-semibold">Aucun film trouvé</h2><p className="mt-1 text-sm text-muted-foreground">Vérifie le titre ou essaie une autre recherche.</p></div>
-            : <p className="mt-3 text-sm text-muted-foreground">Saisis un titre, un réalisateur ou un mot-clé.</p>}
+            : <div className="zen-mobile-empty mt-8 bg-muted/60 px-5 py-10 text-center"><Search className="mx-auto size-6 text-primary" /><p className="mt-3 font-semibold">Tout le cinéma, en quelques mots.</p><p className="mx-auto mt-1 max-w-xs text-sm leading-5 text-muted-foreground">Saisis un titre, un réalisateur ou une ambiance.</p></div>}
         </section>
       </div>
       <AfterFilmDialog open={Boolean(afterFilmMovie)} title={afterFilmMovie?.title || "ce film"} onOpenChange={(open) => { if (!open) setAfterFilmMovie(null); }} onSave={saveAfterFilm} />

@@ -1,3 +1,10 @@
+## 12-09-2026
+
+- 10:27 Refonte `/polish` et `/clarify` du chat après-film : placement rapproché de la note, accueil conversationnel sans fausse bulle, suggestions lisibles, messages mieux hiérarchisés, compositeur iOS tactile, libellés plus précis et reprise d’envoi explicite.
+- 08:50 Rendu de la discussion IA accessible pour tous les films du catalogue, y compris les entrées historiques sans visionnage : le premier message initialise explicitement le visionnage associé avant d’enregistrer la conversation.
+- 08:30 Refonte approfondie de l’expérience mobile iOS : véritable conversation IA dans le journal, compositeur multilignes avec suggestions et reprise sur erreur, formulaires « Ce soir » et Parcours restructurés, onboarding et activation accessibles, recherche fiabilisée, surfaces harmonisées et cibles tactiles portées à 44 px minimum.
+- 08:30 Correction du panneau d’actions des fiches film sur mobile : largeur contrainte au viewport, marges latérales sûres, hauteur maximale défilable et centrage desktop explicite afin d’éviter tout débordement d’écran.
+
 ## 11-09-2026
 
 - 19:32 Fiabilisation de « Ce soir » avec le mode JSON structuré de Workers AI, une température réduite et une lecture directe de la réponse typée afin de conserver le classement et les justifications du modèle.

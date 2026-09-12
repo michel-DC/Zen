@@ -15,6 +15,7 @@ const items = [
 
 export default function TabletNavigation() {
   const pathname = usePathname();
+  if (pathname === "/unlock") return null;
   return (
     <aside className="zen-tablet-sidebar" aria-label="Navigation iPad">
       <Link href="/" aria-label="Zen — accueil" className="zen-tablet-logo">
