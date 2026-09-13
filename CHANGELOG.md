@@ -1,3 +1,7 @@
+## 13-09-2026
+
+- 09:36 Nettoyage des artefacts locaux de développement et de vérification : captures d’écran, sorties Playwright, journaux temporaires et états de cache/outils supprimés ; ces éléments sont désormais ignorés par Git.
+
 ## 12-09-2026
 
 - 11:10 Fiabilisation des parcours centrés sur une personne : Zen recherche désormais la personne sur TMDB, vérifie son nom exact pour éviter les homonymes et, pour un cinéaste, compose le parcours à partir de ses réalisations plutôt que de tous ses crédits techniques.

@@ -15,3 +15,11 @@ worker/.dev.vars
 verification-*.png
 
 .vercel
+
+# Artefacts locaux de développement et de vérification
+.playwright-cli/
+.pnpm-store/
+.impeccable/
+.wrangler/
+output/
+verification/
