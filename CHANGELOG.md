@@ -1,5 +1,6 @@
 ## 13-09-2026
 
+- 19:06 Correction du mode « Surprends-moi » de la page « Ce soir » : libellé grammaticalement juste, vivier de films diversifié au-delà du catalogue, prise en compte des films de référence et filtrage strict des genres explicitement refusés avant le classement IA.
 - 09:36 Nettoyage des artefacts locaux de développement et de vérification : captures d’écran, sorties Playwright, journaux temporaires et états de cache/outils supprimés ; ces éléments sont désormais ignorés par Git.
 
 ## 12-09-2026
