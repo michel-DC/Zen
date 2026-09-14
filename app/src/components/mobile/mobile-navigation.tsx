@@ -8,7 +8,7 @@ import styles from "./mobile-navigation.module.css";
 const items = [
   { href: "/", label: "Accueil", icon: Home, matches: ["/"] },
   { href: "/catalog", label: "Bibliothèque", icon: Library, matches: ["/catalog", "/watchlist", "/top"] },
-  { href: "/tonight", label: "Ce soir", icon: Compass, matches: ["/tonight", "/journeys"] },
+  { href: "/tonight", label: "Ce soir", icon: Compass, matches: ["/tonight", "/journeys", "/recommendations"] },
   { href: "/search", label: "Rechercher", icon: Search, matches: ["/search"] },
   { href: "/settings", label: "Réglages", icon: Settings, matches: ["/settings"] },
 ];

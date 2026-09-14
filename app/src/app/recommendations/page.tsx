@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ButtonGroup, ButtonGroupText } from "@/components/ui/button-group";
 import { PageHeading } from "@/components/layout/page-heading";
+import MobileTonightTabs from "@/components/mobile/tonight-tabs";
 import { Field, FieldLabel } from "@/components/ui/field";
 import MoviePoster from "@/components/movie-poster";
 import { Switch } from "@/components/ui/switch";
@@ -55,7 +56,7 @@ export default function RecommendationsPage() {
   const reject = async (movie: RecommendationResult) => { try { await catalogApi.rejectRecommendation(movie.id); setResults((items) => items.filter((item) => item.id !== movie.id)); toast.success("Film masqué des recommandations"); } catch (error: any) { toast.error(error?.message || "Impossible de masquer ce film"); } };
 
   return <main id="main-content" className="zen-discover zen-mobile-page w-full px-5 pb-8 pt-[max(2rem,env(safe-area-inset-top))] sm:px-6 md:py-8 lg:px-8"><section className="space-y-6">
-    <div className="md:hidden"><p className="zen-mobile-kicker">Découvrir</p><h1 className="zen-mobile-title mt-2">Partir d’un film aimé.</h1><p className="zen-mobile-lead mt-3 max-w-xs">Choisis une référence et Zen te propose une piste proche, sans répéter ce que tu connais déjà.</p></div><div className="hidden md:block"><PageHeading title="Recommandations" /></div>
+    <div className="md:hidden"><p className="zen-mobile-kicker">Découvrir</p><h1 className="zen-mobile-title mt-2">Partir d’un film aimé.</h1><p className="zen-mobile-lead mt-3 max-w-xs">Choisis une référence et Zen te propose une piste proche, sans répéter ce que tu connais déjà.</p><MobileTonightTabs /></div><div className="hidden md:block"><PageHeading title="Recommandations" /></div>
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem]">
       <section className="space-y-5"><div className="space-y-3"><FieldLabel htmlFor="reference-search">Rechercher un film de référence</FieldLabel><ButtonGroup className="w-full"><ButtonGroupText aria-hidden="true" className="bg-background px-3"><Search /></ButtonGroupText><Input id="reference-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Titre ou réalisateur" className="min-w-0 flex-1" style={{ width: 0 }} autoComplete="off" /></ButtonGroup></div>
         {query.trim().length >= 2 ? <section className="space-y-4"><div className="border-b border-border pb-2"><h2 className="text-lg font-semibold tracking-tight">Résultats</h2></div>{matches.length ? <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">{matches.map((movie, index) => <MovieChoice key={movie.id} movie={movie} priority={index < 2} onAdd={() => addSource(movie.id)} />)}</div> : <p className="border-y border-border py-3 text-sm text-muted-foreground">Aucun film correspondant.</p>}</section> : <section className="space-y-4"><div className="border-b border-border pb-2"><h2 className="text-lg font-semibold tracking-tight">Derniers films vus</h2></div>{loading ? <p className="text-sm text-muted-foreground">Chargement du catalogue…</p> : <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">{latest.map((movie, index) => <MovieChoice key={movie.id} movie={movie} priority={index < 2} onAdd={() => addSource(movie.id)} />)}</div>}</section>}

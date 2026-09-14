@@ -55,6 +55,11 @@ export default function MobileExperience({ children }: { children: React.ReactNo
   }, []);
 
   React.useEffect(() => {
+    document.documentElement.toggleAttribute("data-zen-conversation", pathname.endsWith("/conversation"));
+    return () => document.documentElement.removeAttribute("data-zen-conversation");
+  }, [pathname]);
+
+  React.useEffect(() => {
     if (!connectionRestored) return;
     const timer = window.setTimeout(() => setConnectionRestored(false), 2800);
     return () => window.clearTimeout(timer);

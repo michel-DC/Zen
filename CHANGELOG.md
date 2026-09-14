@@ -1,3 +1,8 @@
+## 14-09-2026
+
+- 08:59 Intégration mobile des recommandations par film de référence dans la section « Ce soir » : ajout d’un troisième sous-onglet « Similaires », cibles tactiles agrandies et état actif cohérent dans les navigations mobile et tablette.
+- 08:40 Refonte de la discussion IA en page plein écran dédiée par film : accès depuis le journal, bulles très arrondies inspirées d’iMessage, en-tête et compositeur adaptés aux zones sûres, message affiché et champ vidé immédiatement à l’envoi, attente visible et reprise fiable après erreur.
+
 ## 13-09-2026
 
 - 19:06 Correction du mode « Surprends-moi » de la page « Ce soir » : libellé grammaticalement juste, vivier de films diversifié au-delà du catalogue, prise en compte des films de référence et filtrage strict des genres explicitement refusés avant le classement IA.

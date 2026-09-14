@@ -1,19 +1,15 @@
 "use client";
 
 import AfterFilmDialog, { type AfterFilmPayload } from "@/components/journal/after-film-dialog";
-import JournalConversation from "@/components/journal/journal-conversation";
 import { catalogApi, type CatalogMovie } from "@/lib/services/catalog-api";
 import { syncJourneyAfterViewing } from "@/lib/journey-progress";
-import { Heart, RotateCcw, Star } from "lucide-react";
+import { ArrowRight, Heart, MessageCircle, RotateCcw, Star } from "lucide-react";
+import Link from "next/link";
 import * as React from "react";
 import { toast } from "sonner";
 
 function dateLabel(value: string) {
   return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${value}T12:00:00`));
-}
-
-function dateForFirstViewing(movie: CatalogMovie): string {
-  return movie.watched_at || movie.created_at.slice(0, 10);
 }
 
 function Stars({ rating }: { rating: number | null }) {
@@ -22,7 +18,6 @@ function Stars({ rating }: { rating: number | null }) {
 
 export default function FilmJournal({ movie, onUpdated }: { movie: CatalogMovie; onUpdated: (movie: CatalogMovie) => void }) {
   const [rewatchOpen, setRewatchOpen] = React.useState(false);
-  const [pendingMessage, setPendingMessage] = React.useState(false);
   const viewings = movie.viewings ?? [];
   const ratingHistory = movie.rating_history ?? [];
   const lastViewing = viewings.at(-1);
@@ -47,36 +42,6 @@ export default function FilmJournal({ movie, onUpdated }: { movie: CatalogMovie;
     }
   };
 
-  const send = async (message: string) => {
-    if (!message.trim() || pendingMessage) return false;
-    setPendingMessage(true);
-    try {
-      let activeMovie = movie;
-      let activeViewing = lastViewing;
-
-      if (!activeViewing) {
-        const created = await catalogApi.createViewing(movie.id, {
-          watched_at: dateForFirstViewing(movie),
-          is_rewatch: false,
-        });
-        activeMovie = created.movie;
-        activeViewing = created.viewing;
-      }
-
-      const result = await catalogApi.continueConversation(movie.id, activeViewing.id, message.trim());
-      onUpdated({
-        ...activeMovie,
-        viewings: activeMovie.viewings.map((viewing) => viewing.id === result.viewing.id ? result.viewing : viewing),
-      });
-      return true;
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "La discussion est indisponible");
-      return false;
-    } finally {
-      setPendingMessage(false);
-    }
-  };
-
   return (
     <section className="mt-10 border-t border-border pt-8" aria-labelledby="journal-title">
       <div className="flex items-start justify-between gap-4">
@@ -85,7 +50,20 @@ export default function FilmJournal({ movie, onUpdated }: { movie: CatalogMovie;
       </div>
       <div className="mt-5 flex items-center justify-between rounded-2xl bg-muted p-4"><div><p className="text-sm text-muted-foreground">Note actuelle</p><div className="mt-1"><Stars rating={movie.rating} /></div></div><button type="button" onClick={() => setRewatchOpen(true)} className="flex min-h-11 items-center gap-2 rounded-full bg-background px-4 text-sm font-semibold"><RotateCcw className="size-4" />{lastViewing ? "Revisionner" : "Ajouter un visionnage"}</button></div>
       {ratingHistory.length > 1 && <details className="mt-4 rounded-2xl bg-muted p-4"><summary className="cursor-pointer text-sm font-semibold">Évolution de ta note</summary><ol className="mt-3 space-y-2 text-sm text-muted-foreground">{[...ratingHistory].reverse().map((entry) => <li key={`${entry.recorded_at}-${entry.rating}`} className="flex justify-between gap-3"><span>{dateLabel(entry.recorded_at)}</span><span className="font-semibold text-foreground">{entry.rating.toLocaleString("fr-FR")}/5</span></li>)}</ol></details>}
-      <JournalConversation movieTitle={movie.title} messages={lastViewing?.conversation ?? []} pending={pendingMessage} onSend={send} initialViewingDate={lastViewing ? null : dateForFirstViewing(movie)} />
+      {movie.tmdb_id !== null && (
+        <div className="mt-6 border-y border-border py-5">
+          <div className="flex items-start gap-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-foreground"><MessageCircle className="size-5" aria-hidden="true" /></span>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold">Parler de {movie.title}</h3>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">Poursuis ta réflexion avec Zen dans une discussion dédiée.</p>
+              <Link href={`/movies/${movie.tmdb_id}/conversation`} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+                Ouvrir la discussion <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mt-6 space-y-3">{[...viewings].reverse().map((viewing) => <article key={viewing.id} className="rounded-2xl bg-muted p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">{viewing.is_rewatch ? "Revisionnage" : "Premier visionnage"}</p><p className="mt-1 text-sm text-muted-foreground">{dateLabel(viewing.watched_at)}</p></div>{viewing.reflection_status === "pending" && <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-muted-foreground">À compléter</span>}</div>{viewing.impression && <p className="mt-4 text-sm leading-6">{viewing.impression}</p>}{((viewing.emotions ?? []).length > 0 || (viewing.appreciated_aspects ?? []).length > 0) && <div className="mt-4 flex flex-wrap gap-2">{[...(viewing.emotions ?? []), ...(viewing.appreciated_aspects ?? [])].map((item) => <span key={item} className="rounded-full bg-background px-3 py-1 text-xs font-medium">{item.replaceAll("_", " ")}</span>)}</div>}</article>)}</div>
       <AfterFilmDialog open={rewatchOpen} title={movie.title} onOpenChange={setRewatchOpen} onSave={saveViewing} />
     </section>
