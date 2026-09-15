@@ -237,6 +237,179 @@ body {
   [data-slot="button"], [data-slot="input"] { transition: none; }
 }
 
+.zen-phone-shell {
+  display: contents;
+}
+
+.zen-desktop-gate {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  body:has(.zen-desktop-gate) {
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .zen-phone-shell {
+    display: none;
+  }
+
+  .zen-desktop-gate {
+    display: grid;
+    min-height: 100dvh;
+    place-items: center;
+    overflow: auto;
+    padding: clamp(2rem, 5vw, 5rem);
+    background:
+      linear-gradient(color-mix(in oklab, var(--primary) 5%, transparent), transparent 42%),
+      var(--background);
+  }
+
+  .zen-desktop-gate__frame {
+    display: grid;
+    width: min(100%, 72rem);
+    grid-template-areas:
+      "brand"
+      "visual"
+      "message";
+    justify-items: center;
+    gap: clamp(1.5rem, 4vh, 3rem);
+  }
+
+  .zen-desktop-gate__brand {
+    grid-area: brand;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--foreground);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .zen-desktop-gate__visual {
+    grid-area: visual;
+    width: min(46vw, 22rem);
+    color: #007d66;
+  }
+
+  .zen-desktop-gate__visual img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .zen-desktop-gate__message {
+    grid-area: message;
+    max-width: 38rem;
+    text-align: center;
+  }
+
+  .zen-desktop-gate__status {
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: center;
+    gap: 0.55rem;
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    background: color-mix(in oklab, var(--primary) 11%, var(--background));
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .zen-desktop-gate__status svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .zen-desktop-gate__message h1 {
+    margin-top: 1.5rem;
+    color: var(--foreground);
+    font-size: clamp(2.75rem, 5vw, 5rem);
+    font-weight: 750;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .zen-desktop-gate__lead {
+    max-width: 34rem;
+    margin: 1.5rem auto 0;
+    color: var(--muted-foreground);
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .zen-desktop-gate__hint {
+    display: flex;
+    max-width: 30rem;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 2rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .zen-desktop-gate__hint svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: none;
+    color: var(--primary);
+  }
+
+  .zen-desktop-gate__hint p {
+    color: var(--muted-foreground);
+    line-height: 1.5;
+  }
+
+  .zen-desktop-gate__hint strong {
+    color: var(--foreground);
+  }
+}
+
+@media (min-width: 1100px) {
+  .zen-desktop-gate__frame {
+    grid-template-areas:
+      "brand brand"
+      "visual message";
+    grid-template-columns: minmax(22rem, 0.9fr) minmax(30rem, 1.1fr);
+    align-items: center;
+    justify-items: start;
+    column-gap: clamp(4rem, 8vw, 8rem);
+  }
+
+  .zen-desktop-gate__visual {
+    width: 100%;
+  }
+
+  .zen-desktop-gate__message {
+    text-align: left;
+  }
+
+  .zen-desktop-gate__lead,
+  .zen-desktop-gate__hint {
+    margin-inline: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-height: 500px) and (pointer: coarse) {
+  body:has(.zen-desktop-gate) {
+    overflow: auto;
+  }
+
+  .zen-phone-shell {
+    display: contents;
+  }
+
+  .zen-desktop-gate {
+    display: none;
+  }
+}
+
 .zen-mobile-scene {
   width: 100%;
 }

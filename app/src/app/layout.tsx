@@ -1,4 +1,5 @@
 import Header from "@/components/layout/header";
+import PhoneOnlyGate from "@/components/layout/phone-only-gate";
 import { LoadingLineProvider } from "@/components/layout/loading-line-provider";
 import PwaRegister from "@/components/pwa-register";
 import MobileNavigation from "@/components/mobile/mobile-navigation";
@@ -49,13 +50,16 @@ export default function RootLayout({
         >
           <Suspense fallback={null}>
             <LoadingLineProvider>
-              <PwaRegister />
-              <Header />
-              <TabletNavigation />
-              <MobileExperience>{children}</MobileExperience>
-              <Onboarding />
-              <MobileNavigation />
-              <Toaster position="bottom-center" />
+              <div className="zen-phone-shell">
+                <PwaRegister />
+                <Header />
+                <TabletNavigation />
+                <MobileExperience>{children}</MobileExperience>
+                <Onboarding />
+                <MobileNavigation />
+                <Toaster position="bottom-center" />
+              </div>
+              <PhoneOnlyGate />
             </LoadingLineProvider>
           </Suspense>
         </ThemeProvider>

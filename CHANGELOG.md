@@ -1,3 +1,7 @@
+## 15-09-2026
+
+- 18:03 Restriction de Zen aux téléphones : remplacement complet de l’application par un écran d’accès refusé sur tablette et ordinateur, avec message bienveillant et illustration unDraw « Access denied » recolorée dans le vert officiel de Zen.
+
 ## 14-09-2026
 
 - 08:59 Intégration mobile des recommandations par film de référence dans la section « Ce soir » : ajout d’un troisième sous-onglet « Similaires », cibles tactiles agrandies et état actif cohérent dans les navigations mobile et tablette.
