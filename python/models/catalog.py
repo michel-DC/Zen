@@ -45,7 +45,7 @@ class CatalogMovieBase(BaseModel):
     tmdb_id: int | None = Field(default=None, ge=1)
     genres: list[str] = Field(default_factory=list)
     watched_at: date | None = None
-    rating: float | None = Field(default=None, ge=0, le=10)
+    rating: float | None = Field(default=None, ge=0, le=5, multiple_of=0.5)
     favorite: bool = False
     notes: str | None = Field(default=None, max_length=4000)
 
@@ -81,7 +81,7 @@ class CatalogMovieUpdate(BaseModel):
     tmdb_id: int | None = Field(default=None, ge=1)
     genres: list[str] | str | None = None
     watched_at: date | None = None
-    rating: float | None = Field(default=None, ge=0, le=10)
+    rating: float | None = Field(default=None, ge=0, le=5, multiple_of=0.5)
     favorite: bool | None = None
     notes: str | None = Field(default=None, max_length=4000)
 

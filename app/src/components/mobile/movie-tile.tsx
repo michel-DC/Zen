@@ -3,7 +3,7 @@
 import MoviePoster from "@/components/movie-poster";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { extractImagePalette, type ImagePaletteColor } from "@/lib/image-palette";
-import { BookmarkPlus, Check, Library, MoreHorizontal, Trash2 } from "lucide-react";
+import { BookmarkPlus, Check, Library, MoreHorizontal, Star, Trash2 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
@@ -13,13 +13,14 @@ type Props = {
   title: string;
   author?: string | null;
   year?: number | null;
+  rating?: number | null;
   onCatalog?: () => void;
   onWatchlist?: () => void;
   onDelete?: () => void;
   onWatched?: () => void;
 };
 
-export default function MobileMovieTile({ id, image, title, author, year, onCatalog, onWatchlist, onDelete, onWatched }: Props) {
+export default function MobileMovieTile({ id, image, title, author, year, rating, onCatalog, onWatchlist, onDelete, onWatched }: Props) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [paletteResult, setPaletteResult] = React.useState<{ source: string; colors: ImagePaletteColor[] } | null>(null);
   const palette = paletteResult && paletteResult.source === image ? paletteResult.colors : [];
@@ -75,7 +76,7 @@ export default function MobileMovieTile({ id, image, title, author, year, onCata
           <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-foreground/90">{title}</h3>
           <div className="mt-1 flex items-center justify-between gap-2">
             <p className="min-w-0 truncate text-xs text-muted-foreground">{author ? `Par ${author}` : year ?? ""}</p>
-            {palette.length > 0 && <span aria-label="Palette de l’affiche" className="flex shrink-0 -space-x-1">{palette.map((color, index) => <i key={color.hex} aria-hidden className={`size-3 rounded-full border border-background ${index === 0 ? "z-30" : index === 1 ? "z-20" : "z-10"}`} style={{ backgroundColor: color.hex }} />)}</span>}
+            {rating != null ? <span aria-label={`Ma note : ${rating.toLocaleString("fr-FR")} sur 5`} className="flex shrink-0 items-center gap-1 text-xs font-semibold text-foreground"><Star aria-hidden className="size-3.5 fill-primary text-primary" />{rating.toLocaleString("fr-FR")}</span> : palette.length > 0 && <span aria-label="Palette de l’affiche" className="flex shrink-0 -space-x-1">{palette.map((color, index) => <i key={color.hex} aria-hidden className={`size-3 rounded-full border border-background ${index === 0 ? "z-30" : index === 1 ? "z-20" : "z-10"}`} style={{ backgroundColor: color.hex }} />)}</span>}
           </div>
         </Link>
       </article>

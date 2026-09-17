@@ -13,7 +13,7 @@ function dateLabel(value: string) {
 }
 
 function Stars({ rating }: { rating: number | null }) {
-  return <span className="flex items-center gap-0.5" aria-label={rating ? `${rating} sur 5` : "Non noté"}>{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`size-4 ${rating && rating > index ? "fill-primary text-primary" : "text-muted-foreground/30"}`} />)}{rating && <span className="ml-1 text-sm font-semibold">{rating.toLocaleString("fr-FR")}</span>}</span>;
+  return <span className="flex items-center gap-0.5" aria-label={rating ? `${rating.toLocaleString("fr-FR")} sur 5` : "Non noté"}>{Array.from({ length: 5 }, (_, index) => { const fill = Math.max(0, Math.min(1, (rating ?? 0) - index)); return <span key={index} className="relative size-4"><Star aria-hidden className="absolute inset-0 size-4 text-muted-foreground/30" /><span aria-hidden className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}><Star className="size-4 fill-primary text-primary" /></span></span>; })}{rating && <span className="ml-1 text-sm font-semibold">{rating.toLocaleString("fr-FR")}</span>}</span>;
 }
 
 export default function FilmJournal({ movie, onUpdated }: { movie: CatalogMovie; onUpdated: (movie: CatalogMovie) => void }) {

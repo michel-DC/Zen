@@ -31,12 +31,15 @@ function toggle(values: string[], value: string) {
 }
 
 function RatingPicker({ value, onChange }: { value: number | null; onChange: (value: number) => void }) {
-  return <div role="radiogroup" aria-label="Note sur cinq" className="flex items-center gap-1">
-    {Array.from({ length: 5 }, (_, index) => {
-      const fill = Math.max(0, Math.min(1, (value ?? 0) - index));
-      return <span key={index} className="relative block size-8"><Star aria-hidden className="absolute inset-0 size-8 text-muted-foreground/35" strokeWidth={1.6} /><span aria-hidden className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}><Star className="size-8 fill-primary text-primary" strokeWidth={1.6} /></span><button type="button" className="absolute inset-y-0 left-0 w-1/2 focus-visible:outline-2 focus-visible:outline-ring" aria-label={`${index + 0.5} étoiles`} aria-pressed={value === index + 0.5} onClick={() => onChange(index + 0.5)} /><button type="button" className="absolute inset-y-0 right-0 w-1/2 focus-visible:outline-2 focus-visible:outline-ring" aria-label={`${index + 1} étoiles`} aria-pressed={value === index + 1} onClick={() => onChange(index + 1)} /></span>;
-    })}
-    <span className="ml-2 min-w-10 text-sm font-semibold tabular-nums">{value ? `${value.toLocaleString("fr-FR")}/5` : ""}</span>
+  return <div>
+    <div role="radiogroup" aria-label="Note sur cinq" className="flex items-center gap-1">
+      {Array.from({ length: 5 }, (_, index) => {
+        const fill = Math.max(0, Math.min(1, (value ?? 0) - index));
+        return <span key={index} className="relative block size-8"><Star aria-hidden className="absolute inset-0 size-8 text-muted-foreground/35" strokeWidth={1.6} /><span aria-hidden className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}><Star className="size-8 fill-primary text-primary" strokeWidth={1.6} /></span><button type="button" className="absolute inset-y-0 left-0 w-1/2 focus-visible:outline-2 focus-visible:outline-ring" aria-label={`${index + 0.5} étoiles`} aria-pressed={value === index + 0.5} onClick={() => onChange(index + 0.5)} /><button type="button" className="absolute inset-y-0 right-0 w-1/2 focus-visible:outline-2 focus-visible:outline-ring" aria-label={`${index + 1} étoiles`} aria-pressed={value === index + 1} onClick={() => onChange(index + 1)} /></span>;
+      })}
+      <span className="ml-2 min-w-10 text-sm font-semibold tabular-nums">{value ? `${value.toLocaleString("fr-FR")}/5` : ""}</span>
+    </div>
+    <p className="mt-1 text-xs text-muted-foreground">Appuie à gauche ou à droite d’une étoile pour choisir une demi-note.</p>
   </div>;
 }
 
