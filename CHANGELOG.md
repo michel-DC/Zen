@@ -1,3 +1,29 @@
+## 17-09-2026
+
+- 11:48 Ajout de trois règles expert au quiz : Noir cinéma, Plan inversé et Une chance, combinables avec Plan flash, Sprint et Sans titres.
+- 11:41 Remplacement du mode Réalisateur mystère du quiz par Plan flash (image retirée après six secondes) et Sprint (quinze secondes fixes par plan).
+- 11:32 Refonte iOS de la préparation du quiz : parcours présenté en contrôle segmenté, longueurs regroupées dans une liste tactile et options expertes déplacées dans une feuille dédiée pour supprimer la grille de cartes.
+- 15:21 Retrait de la note TMDB des cartes mobiles et ajout des notes personnelles par demi-étoiles, de 0,5 à 5, avec indication tactile et rendu fidèle des moitiés d’étoile dans le journal.
+- 15:14 Ajout de la note TMDB sur les cartes mobiles, chargée à l’apparition de chaque affiche et distinguée de la note personnelle.
+- 15:06 Affichage de la note personnelle à droite des cartes de films mobiles, avec conservation de la palette de l’affiche pour les films non notés.
+- 10:56 Recomposition du quiz mobile comme une leçon guidée : navigation de l’application masquée pendant une question, barre de progression épurée et correction pleine largeur ancrée au bas de l’écran, sans scroll ni changement de format de l’image.
+- 11:18 Durcissement du quiz cinéma : deux plans secondaires par film, premier cadre qui se révèle après vingt secondes, compte à rebours progressif, faux choix plus proches, mode Survie à trois vies, options Sans titres et Réalisateur mystère.
+- 10:51 Refonte du quiz en mode défi : progression et correction inspirées des leçons mobiles, plans secondaires plus resserrés, et faux titres rapprochés du bon film par genre, époque et réalisateur.
+- 10:56 Le quiz exclut désormais les visuels TMDB localisés — notamment les affiches promotionnelles contenant le titre — et saute un film dépourvu d’image de scène sans texte plutôt que de révéler sa réponse.
+- 10:35 Ajout de la page Quiz : choix du format de partie, images et titres exclusifs au catalogue, quatre réponses distinctes, chrono de 60 secondes, correction immédiate, score final humoristique et accès depuis les navigations Zen.
+- 10:33 Rééquilibrage visuel de la navigation mobile : cinq entrées centrées, libellés contenus dans leur colonne et transparence renforcée pour préserver la lisibilité sur les affiches.
+- 10:31 Retrait de l’entrée « Rechercher » de la navigation mobile, sans modifier les cinq destinations restantes.
+- 10:29 Uniformisation du défilement : les pages et leurs zones défilables conservent le geste de scroll sans afficher de barre de défilement.
+- 10:28 Ajout d’un reflet chromé très léger sur la surface translucide de la navigation mobile, adapté aux thèmes clair et sombre.
+- 10:27 Réduction finale de la hauteur de la navigation mobile, de 70 px à environ 64 px, tout en conservant des zones tactiles supérieures à 44 px.
+- 10:26 Restauration du rendu translucide de la navigation mobile : verre clair en mode clair, verre fumé en mode sombre et flou d’arrière-plan conservé.
+- 10:25 Correction de l’adaptation au thème : la navigation conserve son fond blanc en mode clair et adopte désormais la surface sombre de Zen en mode sombre.
+- 10:23 Affinage de la navigation mobile selon la référence : barre raccourcie, icônes réduites et seul le pictogramme de l’onglet actif est désormais vert ; les libellés restent noirs.
+- 10:14 Refonte de la navigation mobile : barre blanche flottante et très arrondie, icône active dans un carré vert Zen et libellé actif assorti, tout en conservant les cinq destinations existantes.
+- 10:10 Précision de la règle de vérification : chaque capture mobile réalisée pour Zen doit aussi être intégrée directement dans la discussion finale.
+- 10:06 Ajout d’une règle de vérification propre à Zen : les captures de l’application seront toujours prises dans le navigateur intégré de Codex, exclusivement en vue mobile.
+- 10:04 Adoucissement du fond du thème sombre : la surface globale adopte désormais le gris très sombre `#171717`, identique à la référence fournie et inspiré de shadcn/ui.
+
 ## 15-09-2026
 
 - 18:03 Restriction de Zen aux téléphones : remplacement complet de l’application par un écran d’accès refusé sur tablette et ordinateur, avec message bienveillant et illustration unDraw « Access denied » recolorée dans le vert officiel de Zen.

@@ -25,7 +25,7 @@ export interface DetailedMovie extends Movie {
   vote_average: number;
   backdrop_path?: string | null;
   images?: {
-    backdrops?: Array<{ file_path: string | null }>;
+    backdrops?: Array<{ file_path: string | null; iso_639_1?: string | null }>;
   };
 }
 

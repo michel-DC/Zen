@@ -9,6 +9,7 @@ type MoviePosterProps = {
   sizes: string;
   priority?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 };
 
 export default function MoviePoster({
@@ -17,6 +18,7 @@ export default function MoviePoster({
   sizes,
   priority = false,
   className = "object-cover",
+  style,
 }: MoviePosterProps) {
   const [failed, setFailed] = React.useState(false);
 
@@ -46,6 +48,7 @@ export default function MoviePoster({
       sizes={sizes}
       priority={priority}
       className={className}
+      style={style}
       onError={() => setFailed(true)}
     />
   );

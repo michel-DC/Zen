@@ -7,7 +7,7 @@ import { ModeToggle } from "@/components/layout/mode-toggle";
 import { HeaderLoadingLine } from "@/components/layout/loading-line-provider";
 const navigationItems = [
   { href: "/", label: "Recherche" }, { href: "/catalog", label: "Catalogue" },
-  { href: "/top", label: "Top 3" }, { href: "/recommendations", label: "Recommandations" }, { href: "/watchlist", label: "À voir" }, { href: "/tonight", label: "Ce soir" }, { href: "/journeys", label: "Parcours" },
+  { href: "/top", label: "Top 3" }, { href: "/quiz", label: "Quiz" }, { href: "/recommendations", label: "Recommandations" }, { href: "/watchlist", label: "À voir" }, { href: "/tonight", label: "Ce soir" }, { href: "/journeys", label: "Parcours" },
 ];
 export default function Header() {
   const pathname = usePathname();

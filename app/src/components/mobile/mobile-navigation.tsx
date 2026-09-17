@@ -1,6 +1,6 @@
 "use client";
 
-import { Compass, Home, Library, Search, Settings } from "lucide-react";
+import { Compass, Gamepad2, Home, Library, Settings } from "lucide-react";
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./mobile-navigation.module.css";
@@ -8,8 +8,8 @@ import styles from "./mobile-navigation.module.css";
 const items = [
   { href: "/", label: "Accueil", icon: Home, matches: ["/"] },
   { href: "/catalog", label: "Bibliothèque", icon: Library, matches: ["/catalog", "/watchlist", "/top"] },
+  { href: "/quiz", label: "Quiz", icon: Gamepad2, matches: ["/quiz"] },
   { href: "/tonight", label: "Ce soir", icon: Compass, matches: ["/tonight", "/journeys", "/recommendations"] },
-  { href: "/search", label: "Rechercher", icon: Search, matches: ["/search"] },
   { href: "/settings", label: "Réglages", icon: Settings, matches: ["/settings"] },
 ];
 

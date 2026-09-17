@@ -67,7 +67,7 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #171717;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -192,9 +192,42 @@
 
 html,
 body {
+  &[data-quiz-flash="hidden"] #main-content section[aria-labelledby="quiz-question-title"] > div:nth-child(2) img {
+    opacity: 0;
+  }
+
+  &[data-quiz-flash="hidden"] #main-content section[aria-labelledby="quiz-question-title"] > div:nth-child(2)::after {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--muted-foreground);
+    content: "À toi de t’en souvenir";
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &[data-quiz-noir] #main-content section[aria-labelledby="quiz-question-title"] > div:nth-child(2) img {
+    filter: grayscale(1) contrast(0.78);
+  }
+
+  &[data-quiz-mirror] #main-content section[aria-labelledby="quiz-question-title"] > div:nth-child(2) img {
+    transform: scaleX(-1);
+  }
   font-family:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
     "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes zen-rainbow-loader {
