@@ -20,6 +20,13 @@ import { toast } from "sonner";
 
 const TMDB_IMAGE_URL = "https://image.tmdb.org/t/p/w780";
 
+function runtimeLabel(runtime: number | null) {
+  if (!runtime || runtime < 1) return null;
+  const hours = Math.floor(runtime / 60);
+  const minutes = runtime % 60;
+  return hours ? `${hours} h${minutes ? ` ${minutes.toString().padStart(2, "0")}` : ""}` : `${minutes} min`;
+}
+
 function StillsCarousel({ movie }: { movie: DetailedMovie }) {
   const backdropPaths = Array.from(new Set([movie.backdrop_path, ...(movie.images?.backdrops ?? []).map((backdrop) => backdrop.file_path)].filter((path): path is string => Boolean(path)))).slice(0, 8);
   if (!backdropPaths.length) return null;
@@ -109,6 +116,7 @@ export default function MovieDetailPage() {
   };
   const isInCatalog = useMemo(() => Boolean(movie && catalogIds.has(movie.id)), [catalogIds, movie]);
   const isInWatchlist = useMemo(() => Boolean(movie && watchlistIds.has(movie.id)), [movie, watchlistIds]);
+  const duration = movie ? runtimeLabel(movie.runtime) : null;
 
   const addTo = async (target: "catalog" | "watchlist") => {
     const alreadyInTarget = target === "catalog" ? isInCatalog : isInWatchlist;
@@ -158,7 +166,7 @@ export default function MovieDetailPage() {
         </div>
         {isLoading ? <div className="space-y-3 py-6"><Skeleton className="h-8 w-3/4" /><Skeleton className="h-5 w-1/2" /><Skeleton className="h-20 w-full" /></div> : movie && <div className="py-6">
           <h1 className="text-[1.9rem] font-bold leading-[1.08] tracking-[-0.04em]">{movie.title}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><span>{movie.release_year}</span><span aria-hidden="true">·</span><span>{movie.director || "Réalisateur inconnu"}</span><span aria-hidden="true">·</span><span className="flex items-center gap-1 text-foreground"><Star className="size-4 fill-current text-amber-500" />{movie.vote_average.toFixed(1)}</span></div>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><span>{movie.release_year}</span>{duration && <><span aria-hidden="true">·</span><span>{duration}</span></>}<span aria-hidden="true">·</span><span>{movie.director || "Réalisateur inconnu"}</span><span aria-hidden="true">·</span><span className="flex items-center gap-1 text-foreground"><Star className="size-4 fill-current text-amber-500" />{movie.vote_average.toFixed(1)}</span></div>
           <div className="mt-4 flex flex-wrap gap-2">{movie.genres.slice(0, 3).map((genre) => <span key={genre} className="rounded-full bg-muted px-3 py-1 text-xs font-medium">{genre}</span>)}</div>
           <div className="mt-6 grid gap-2"><Button className="h-14 rounded-full text-base" disabled={isInCatalog || Boolean(addingTo)} onClick={() => addTo("catalog")}>{addingTo === "catalog" ? "Ajout en cours…" : isInCatalog ? "Déjà dans le catalogue" : "Ajouter au catalogue"}</Button><Button className="h-14 rounded-full text-base" variant="outline" disabled={isInWatchlist || Boolean(addingTo)} onClick={() => addTo("watchlist")}><BookmarkPlus />{addingTo === "watchlist" ? "Ajout en cours…" : isInWatchlist ? "Déjà dans À voir" : "Ajouter à voir"}</Button></div>
           <p className="mt-7 text-base leading-6 text-muted-foreground">{movie.overview || "Aucun synopsis disponible."}</p>
@@ -240,6 +248,7 @@ export default function MovieDetailPage() {
                       <Star className="w-5 h-5 fill-current mr-1" />
                       {movie?.vote_average.toFixed(1)}
                     </div>
+                    {duration && <div className="text-sm text-muted-foreground border-l border-border pl-4">{duration}</div>}
                     <div className="flex items-center text-muted-foreground text-sm border-l border-border pl-4">
                       Par{" "}
                       <span className="font-medium text-foreground ml-1">

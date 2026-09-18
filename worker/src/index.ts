@@ -30,6 +30,7 @@ async function movieDetail(
   return {
     ...detail,
     release_year: Number(String(detail.release_date ?? "").slice(0, 4)) || null,
+    runtime: typeof detail.runtime === "number" && detail.runtime > 0 ? detail.runtime : null,
     genres: Array.isArray(detail.genres)
       ? (detail.genres as JsonObject[]).map((genre) => genre.name)
       : [],

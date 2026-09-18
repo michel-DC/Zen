@@ -1,3 +1,8 @@
+## 18-09-2026
+
+- 19:30 Ajout de la durée TMDB sur les fiches de films, affichée au format heures et minutes dans les interfaces mobile et ordinateur.
+- 19:12 Correction du chargement des fiches de films du catalogue : les dates d'historique horodatées sont désormais formatées correctement et une date invalide n'interrompt plus le rendu.
+
 ## 17-09-2026
 
 - 11:48 Ajout de trois règles expert au quiz : Noir cinéma, Plan inversé et Une chance, combinables avec Plan flash, Sprint et Sans titres.

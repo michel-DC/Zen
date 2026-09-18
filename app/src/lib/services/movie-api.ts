@@ -17,6 +17,7 @@ export interface Movie {
 }
 
 export interface DetailedMovie extends Movie {
+  runtime: number | null;
   genres: string[];
   cast: {
     name: string;
